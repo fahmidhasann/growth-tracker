@@ -18,6 +18,7 @@ interface AppState {
 
   // Skills
   addSkill: (skill: Omit<Skill, 'id' | 'history'>) => Promise<void>;
+  updateSkill: (id: string, data: { name?: string; level?: number }) => Promise<void>;
   updateSkillLevel: (id: string, level: number) => Promise<void>;
   updateSkillName: (id: string, name: string) => Promise<void>;
   deleteSkill: (id: string) => Promise<void>;
@@ -155,6 +156,21 @@ export const useStore = create<AppState>()((set, get) => ({
       set((state) => ({ skills: [created, ...state.skills], error: null }));
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Unable to add skill' });
+      console.error(error);
+    }
+  },
+  updateSkill: async (id, data) => {
+    try {
+      const updated = await apiRequest<Skill>(`/api/skills/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
+      set((state) => ({
+        skills: state.skills.map((entry) => (entry.id === id ? updated : entry)),
+        error: null,
+      }));
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Unable to update skill' });
       console.error(error);
     }
   },

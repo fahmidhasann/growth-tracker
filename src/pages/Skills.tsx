@@ -14,8 +14,8 @@ import { Input } from '../components/ui/Input';
 export function Skills() {
   const skills = useStore((s) => s.skills);
   const addSkill = useStore((s) => s.addSkill);
+  const updateSkill = useStore((s) => s.updateSkill);
   const updateSkillLevel = useStore((s) => s.updateSkillLevel);
-  const updateSkillName = useStore((s) => s.updateSkillName);
   const deleteSkill = useStore((s) => s.deleteSkill);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,8 +41,7 @@ export function Skills() {
     e.preventDefault();
     if (!formData.name.trim()) return;
     if (editingId) {
-      updateSkillName(editingId, formData.name);
-      updateSkillLevel(editingId, formData.level);
+      updateSkill(editingId, { name: formData.name, level: formData.level });
     } else {
       addSkill(formData);
     }
