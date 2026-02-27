@@ -51,7 +51,7 @@ export function Layout({ activeTab, setActiveTab, children }: LayoutProps) {
           })}
         </nav>
         <div className="mt-auto px-4 pt-4 border-t border-zinc-800/50">
-          <p className="text-[10px] text-zinc-600">v1.0 — All data stored locally</p>
+          <p className="text-[10px] text-zinc-600">v1.1 — Cloud data sync enabled</p>
         </div>
       </aside>
 
