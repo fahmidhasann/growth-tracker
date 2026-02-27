@@ -1,15 +1,16 @@
 import type { ReactNode } from 'react';
-import { LayoutDashboard, BookOpen, PenTool, FolderGit2, Trophy } from 'lucide-react';
+import { LayoutDashboard, BookOpen, PenTool, FolderGit2, Trophy, LogOut } from 'lucide-react';
 import { cn } from '../lib/utils';
 import type { Tab } from '../App';
 
 interface LayoutProps {
   activeTab: Tab;
   setActiveTab: (tab: Tab) => void;
+  onLogout: () => void;
   children: ReactNode;
 }
 
-export function Layout({ activeTab, setActiveTab, children }: LayoutProps) {
+export function Layout({ activeTab, setActiveTab, onLogout, children }: LayoutProps) {
   const navItems = [
     { id: 'dashboard' as Tab, label: 'Dashboard', icon: LayoutDashboard },
     { id: 'logs' as Tab, label: 'Logs', icon: BookOpen },
@@ -50,7 +51,15 @@ export function Layout({ activeTab, setActiveTab, children }: LayoutProps) {
             );
           })}
         </nav>
-        <div className="mt-auto px-4 pt-4 border-t border-zinc-800/50">
+        <div className="mt-auto px-4 pt-4 border-t border-zinc-800/50 space-y-3">
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors"
+            aria-label="Sign out"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign out
+          </button>
           <p className="text-[10px] text-zinc-600">v1.1 — Cloud data sync enabled</p>
         </div>
       </aside>

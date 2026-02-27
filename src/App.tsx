@@ -30,6 +30,14 @@ export default function App() {
   const initialized = useStore((s) => s.initialized);
   const error = useStore((s) => s.error);
 
+  const handleLogout = useCallback(async () => {
+    try {
+      await fetch('/api/auth?action=logout', { method: 'POST' });
+    } finally {
+      setIsAuthenticated(false);
+    }
+  }, []);
+
   const navigate = useCallback((tab: Tab) => {
     window.location.hash = tab;
     setActiveTab(tab);
@@ -80,7 +88,7 @@ export default function App() {
   }
 
   return (
-    <Layout activeTab={activeTab} setActiveTab={navigate}>
+    <Layout activeTab={activeTab} setActiveTab={navigate} onLogout={() => void handleLogout()}>
       {!initialized && loading && (
         <div className="min-h-[50vh] flex items-center justify-center text-zinc-400 text-sm">
           Loading your data...
