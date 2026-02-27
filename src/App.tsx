@@ -11,6 +11,7 @@ import { Skills } from './pages/Skills';
 import { Projects } from './pages/Projects';
 import { Milestones } from './pages/Milestones';
 import { useStore } from './store/useStore';
+import { AuthScreen } from './components/AuthScreen';
 
 export type Tab = 'dashboard' | 'logs' | 'skills' | 'projects' | 'milestones';
 const VALID_TABS: Tab[] = ['dashboard', 'logs', 'skills', 'projects', 'milestones'];
@@ -22,6 +23,8 @@ function getTabFromHash(): Tab {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>(getTabFromHash);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const initialize = useStore((s) => s.initialize);
   const loading = useStore((s) => s.loading);
   const initialized = useStore((s) => s.initialized);
@@ -32,17 +35,49 @@ export default function App() {
     setActiveTab(tab);
   }, []);
 
-  useEffect(() => {
-    void initialize();
-  }, [initialize]);
+  const checkSession = useCallback(async () => {
+    setAuthLoading(true);
+    try {
+      const response = await fetch('/api/auth?action=me');
+      const payload = (await response.json()) as { user: { id: string; email: string } | null };
+      setIsAuthenticated(Boolean(payload.user));
+    } catch {
+      setIsAuthenticated(false);
+    } finally {
+      setAuthLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
+    void checkSession();
+  }, [checkSession]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      void initialize();
+    }
+  }, [initialize, isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
     const onHashChange = () => setActiveTab(getTabFromHash());
     window.addEventListener('hashchange', onHashChange);
     // Set initial hash if missing
     if (!window.location.hash) window.location.hash = 'dashboard';
     return () => window.removeEventListener('hashchange', onHashChange);
-  }, []);
+  }, [isAuthenticated]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-zinc-950 text-zinc-300 flex items-center justify-center">
+        Checking session...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <AuthScreen onAuthenticated={() => void checkSession()} />;
+  }
 
   return (
     <Layout activeTab={activeTab} setActiveTab={navigate}>

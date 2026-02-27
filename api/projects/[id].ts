@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { prisma } from '../_lib/db';
-import { isValidDate, parseJsonBody, sendMethodNotAllowed, sendServerError } from '../_lib/http';
-import { mapProject } from '../_lib/mappers';
+import { requireAuth } from '../_lib/auth.js';
+import { prisma } from '../_lib/db.js';
+import { isValidDate, parseJsonBody, sendMethodNotAllowed, sendServerError } from '../_lib/http.js';
+import { mapProject } from '../_lib/mappers.js';
 
 type UpdateProjectBody = {
   title?: string;
@@ -17,6 +18,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    const user = await requireAuth(req, res);
+    if (!user) return;
+
     if (req.method === 'PATCH') {
       const body = parseJsonBody<UpdateProjectBody>(req);
       const data: Record<string, unknown> = {};

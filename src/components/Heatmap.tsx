@@ -1,27 +1,41 @@
 import { useMemo } from 'react';
-import { format, subDays, startOfWeek, addDays } from 'date-fns';
+import { format, subDays, addDays } from 'date-fns';
 import { useStore } from '../store/useStore';
 import { cn } from '../lib/utils';
 import { HEATMAP_COLORS } from '../lib/constants';
 
 export function Heatmap() {
   const logs = useStore((state) => state.logs);
+  const projects = useStore((state) => state.projects);
+  const milestones = useStore((state) => state.milestones);
+  const skills = useStore((state) => state.skills);
 
   const today = new Date();
-  const startDate = startOfWeek(subDays(today, 364));
+  const startDate = subDays(today, 363);
 
   const days = useMemo(
-    () => Array.from({ length: 365 }).map((_, i) => addDays(startDate, i)),
+    () => Array.from({ length: 364 }).map((_, i) => addDays(startDate, i)),
     [startDate.getTime()]
   );
 
+  const toDateKey = (value: string) => value.slice(0, 10);
+
   const activityMap = useMemo(() => {
-    return logs.reduce((acc, log) => {
-      const dateStr = format(new Date(log.date), 'yyyy-MM-dd');
+    const acc: Record<string, number> = {};
+
+    const increment = (date: string) => {
+      if (!date) return;
+      const dateStr = toDateKey(date);
       acc[dateStr] = (acc[dateStr] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-  }, [logs]);
+    };
+
+    logs.forEach((log) => increment(log.date));
+    projects.forEach((project) => increment(project.date));
+    milestones.forEach((milestone) => increment(milestone.date));
+    skills.forEach((skill) => skill.history.forEach((entry) => increment(entry.date)));
+
+    return acc;
+  }, [logs, projects, milestones, skills]);
 
   // Generate month labels with their column positions
   const monthLabels = useMemo(() => {
@@ -79,7 +93,7 @@ export function Heatmap() {
               return (
                 <div
                   key={dateStr}
-                  title={`${format(day, 'MMM dd, yyyy')}: ${count} ${count === 1 ? 'entry' : 'entries'}`}
+                  title={`${format(day, 'MMM dd, yyyy')}: ${count} ${count === 1 ? 'activity' : 'activities'}`}
                   className={cn(
                     'w-3 h-3 rounded-sm transition-colors',
                     getIntensity(count)

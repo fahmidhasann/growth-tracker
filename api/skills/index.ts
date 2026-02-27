@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { prisma } from '../_lib/db';
-import { isValidDate, parseJsonBody, sendMethodNotAllowed, sendServerError } from '../_lib/http';
-import { mapSkill } from '../_lib/mappers';
+import { requireAuth } from '../_lib/auth.js';
+import { prisma } from '../_lib/db.js';
+import { isValidDate, parseJsonBody, sendMethodNotAllowed, sendServerError } from '../_lib/http.js';
+import { mapSkill } from '../_lib/mappers.js';
 
 type HistoryEntry = {
   date: string;
@@ -17,6 +18,9 @@ type CreateSkillBody = {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
+    const user = await requireAuth(req, res);
+    if (!user) return;
+
     if (req.method === 'GET') {
       const skills = await prisma.skill.findMany({
         include: { history: true },

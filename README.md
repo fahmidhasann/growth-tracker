@@ -36,3 +36,17 @@ View your app in AI Studio: https://ai.studio/apps/570425ef-adab-41fe-9cfb-e8d69
 2. Push to GitHub branch.
 3. Open Pull Request (Vercel preview is created automatically).
 4. Merge to `main` to trigger production deploy.
+
+## Google OAuth Setup (Optional)
+
+1. Create OAuth Client in Google Cloud Console (Web application).
+2. Add authorized redirect URI:
+   `https://<your-domain>/api/auth?action=google_callback`
+   Example: `https://growth-tracker-gamma.vercel.app/api/auth?action=google_callback`
+3. In Vercel project environment variables, set:
+   - `GOOGLE_CLIENT_ID`
+   - `GOOGLE_CLIENT_SECRET`
+   - `APP_URL` (your production app URL)
+4. Redeploy production.
+
+When these are configured, the auth screen automatically shows **Continue with Google**.
