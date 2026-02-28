@@ -30,13 +30,14 @@ function resolveAppUrl(req: VercelRequest) {
 }
 
 function getGoogleConfig(req: VercelRequest) {
+  const googleOAuthEnabled = process.env.ENABLE_GOOGLE_OAUTH?.toLowerCase() === 'true';
   const clientId = process.env.GOOGLE_CLIENT_ID?.trim() ?? '';
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim() ?? '';
   const appUrl = resolveAppUrl(req);
   const redirectUri = appUrl ? `${appUrl}/api/auth?action=google_callback` : '';
 
   return {
-    enabled: Boolean(clientId && clientSecret && appUrl),
+    enabled: Boolean(googleOAuthEnabled && clientId && clientSecret && appUrl),
     clientId,
     clientSecret,
     redirectUri,
