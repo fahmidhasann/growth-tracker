@@ -10,10 +10,22 @@ interface StatCardProps {
 }
 
 const colorMap: Record<string, { bg: string; text: string }> = {
-  emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
-  blue: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
-  amber: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
-  purple: { bg: 'bg-purple-500/10', text: 'text-purple-400' },
+  emerald: {
+    bg: 'bg-emerald-500/10 [.light_&]:bg-emerald-100',
+    text: 'text-emerald-400 [.light_&]:text-emerald-700',
+  },
+  blue: {
+    bg: 'bg-blue-500/10 [.light_&]:bg-blue-100',
+    text: 'text-blue-400 [.light_&]:text-blue-700',
+  },
+  amber: {
+    bg: 'bg-amber-500/10 [.light_&]:bg-amber-100',
+    text: 'text-amber-400 [.light_&]:text-amber-700',
+  },
+  purple: {
+    bg: 'bg-purple-500/10 [.light_&]:bg-purple-100',
+    text: 'text-purple-400 [.light_&]:text-purple-700',
+  },
 };
 
 export function StatCard({ icon: Icon, color, count, label, index = 0 }: StatCardProps) {

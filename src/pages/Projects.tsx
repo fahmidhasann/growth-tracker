@@ -194,8 +194,8 @@ export function Projects() {
                     className={cn(
                       'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider transition-colors',
                       project.status === 'completed'
-                        ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
-                        : 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20'
+                        ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 [.light_&]:bg-emerald-100 [.light_&]:text-emerald-700 [.light_&]:hover:bg-emerald-200'
+                        : 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 [.light_&]:bg-amber-100 [.light_&]:text-amber-700 [.light_&]:hover:bg-amber-200'
                     )}
                   >
                     {project.status === 'completed' ? (

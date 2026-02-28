@@ -80,7 +80,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                 <p className="text-zinc-500 text-sm">No skills added yet.</p>
                 <button
                   onClick={() => onNavigate('skills')}
-                  className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
+                  className="text-blue-400 hover:text-blue-300 [.light_&]:text-blue-700 [.light_&]:hover:text-blue-800 text-sm font-medium transition-colors"
                 >
                   Add your first skill &rarr;
                 </button>
@@ -107,7 +107,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                 <p className="text-zinc-500 text-sm">No logs added yet.</p>
                 <button
                   onClick={() => onNavigate('logs')}
-                  className="text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors"
+                  className="text-purple-400 hover:text-purple-300 [.light_&]:text-purple-700 [.light_&]:hover:text-purple-800 text-sm font-medium transition-colors"
                 >
                   Create your first log &rarr;
                 </button>
@@ -141,7 +141,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               <p className="text-zinc-500 text-sm">No milestones recorded yet.</p>
               <button
                 onClick={() => onNavigate('milestones')}
-                className="text-amber-400 hover:text-amber-300 text-sm font-medium transition-colors"
+                className="text-amber-400 hover:text-amber-300 [.light_&]:text-amber-700 [.light_&]:hover:text-amber-800 text-sm font-medium transition-colors"
               >
                 Add a milestone &rarr;
               </button>

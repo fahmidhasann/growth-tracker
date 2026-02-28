@@ -211,22 +211,22 @@ export function Logs() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
-                  <h4 className="text-sm font-medium text-emerald-400 mb-3 uppercase tracking-wider flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <h4 className="text-sm font-medium text-emerald-400 [.light_&]:text-emerald-700 mb-3 uppercase tracking-wider flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 [.light_&]:bg-emerald-600" />
                     Learned
                   </h4>
                   <p className="text-zinc-300 leading-relaxed text-sm">{log.learned}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-blue-400 mb-3 uppercase tracking-wider flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                  <h4 className="text-sm font-medium text-blue-400 [.light_&]:text-blue-700 mb-3 uppercase tracking-wider flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400 [.light_&]:bg-blue-600" />
                     Built
                   </h4>
                   <p className="text-zinc-300 leading-relaxed text-sm">{log.built}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-amber-400 mb-3 uppercase tracking-wider flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                  <h4 className="text-sm font-medium text-amber-400 [.light_&]:text-amber-700 mb-3 uppercase tracking-wider flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 [.light_&]:bg-amber-600" />
                     Challenges
                   </h4>
                   <p className="text-zinc-300 leading-relaxed text-sm">{log.challenges}</p>

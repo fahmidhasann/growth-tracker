@@ -26,7 +26,9 @@ export function ConfirmDialog({
       <div className="space-y-6">
         <div className="flex gap-4 items-start">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-            variant === 'danger' ? 'bg-red-500/10 text-red-400' : 'bg-amber-500/10 text-amber-400'
+            variant === 'danger'
+              ? 'bg-red-500/10 text-red-400 [.light_&]:bg-red-100 [.light_&]:text-red-700'
+              : 'bg-amber-500/10 text-amber-400 [.light_&]:bg-amber-100 [.light_&]:text-amber-700'
           }`}>
             <AlertTriangle className="w-5 h-5" />
           </div>
