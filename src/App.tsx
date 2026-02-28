@@ -14,6 +14,7 @@ import { useStore } from './store/useStore';
 import { AuthScreen } from './components/AuthScreen';
 
 export type Tab = 'dashboard' | 'logs' | 'skills' | 'projects' | 'milestones';
+export type Theme = 'dark' | 'light';
 const VALID_TABS: Tab[] = ['dashboard', 'logs', 'skills', 'projects', 'milestones'];
 
 function getTabFromHash(): Tab {
@@ -23,6 +24,13 @@ function getTabFromHash(): Tab {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>(getTabFromHash);
+  const [theme, setTheme] = useState<Theme>(() => {
+    const savedTheme = window.localStorage.getItem('growth-tracker-theme');
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+      return savedTheme;
+    }
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  });
   const [authLoading, setAuthLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const initialize = useStore((s) => s.initialize);
@@ -67,6 +75,11 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    document.documentElement.classList.toggle('light', theme === 'light');
+    window.localStorage.setItem('growth-tracker-theme', theme);
+  }, [theme]);
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-zinc-950 text-zinc-300 flex items-center justify-center">
@@ -80,7 +93,12 @@ export default function App() {
   }
 
   return (
-    <Layout activeTab={activeTab} setActiveTab={navigate}>
+    <Layout
+      activeTab={activeTab}
+      setActiveTab={navigate}
+      theme={theme}
+      setTheme={setTheme}
+    >
       {!initialized && loading && (
         <div className="min-h-[50vh] flex items-center justify-center text-zinc-400 text-sm">
           Loading your data...
