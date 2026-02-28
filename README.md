@@ -30,6 +30,32 @@ View your app in AI Studio: https://ai.studio/apps/570425ef-adab-41fe-9cfb-e8d69
 5. Start app:
    `npm run dev`
 
+## Reliable Local Verification Workflow (Before GitHub Push)
+
+Use this when you want to quickly validate UI/feature changes locally every time.
+
+1. Copy env template if needed:
+   `cp .env.example .env.local`
+2. Make sure local env has your DB URL (`POSTGRES_PRISMA_URL` or `DATABASE_URL`).
+   - Quickest way if deployed on Vercel: `npx vercel env pull .env.local`
+3. Enable local auth bypass in `.env.local`:
+   - `DEV_AUTH_BYPASS="true"`
+   - optional: `DEV_AUTH_EMAIL="local-dev@growth-tracker.local"`
+4. Sync Prisma schema:
+   - `npm run db:generate`
+   - `npm run db:push`
+5. Run locally:
+   `npm run dev:local`
+
+With `DEV_AUTH_BYPASS=true`, local API routes auto-authenticate in non-production so you can test features/designs without login friction.
+
+Use `npm run dev:local` (Vercel dev) when testing auth + API behavior. `npm run dev` (Vite only) is frontend-only and does not execute the serverless API layer correctly.
+
+Important:
+- This bypass is ignored in production (`NODE_ENV=production`).
+- Keep `DEV_AUTH_BYPASS=false` in Vercel environments.
+- `npm run db:*` commands now load `.env.local` automatically and fallback to `DATABASE_URL` if `POSTGRES_PRISMA_URL` is missing.
+
 ## Authentication on Vercel (Simplest Path)
 
 This app already has **built-in owner authentication** (email/password) and optional Google OAuth.

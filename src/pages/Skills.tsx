@@ -151,7 +151,7 @@ export function Skills() {
                 <div className="flex justify-between items-start">
                   <h3 className="text-xl font-medium text-zinc-100">{skill.name}</h3>
                   <div className="flex items-center gap-1.5">
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => openEdit(skill.id)}
                         className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"

@@ -186,7 +186,7 @@ export function Logs() {
                   {format(new Date(log.date), 'MMMM dd, yyyy')}
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => openEdit(log.id)}
                       className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"

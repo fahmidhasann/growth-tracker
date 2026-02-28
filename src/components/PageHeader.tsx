@@ -17,17 +17,17 @@ export function PageHeader({
   onAction,
 }: PageHeaderProps) {
   return (
-    <header className="flex justify-between items-center">
-      <div>
+    <header className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+      <div className="min-w-0">
         <h2 className="text-3xl font-semibold tracking-tight text-zinc-100">{title}</h2>
-        <p className="text-zinc-400 mt-2">{subtitle}</p>
+        <p className="text-zinc-400 mt-2 max-w-prose">{subtitle}</p>
       </div>
       {actionLabel && onAction && (
         <Button
           variant="primary"
           size="md"
           onClick={onAction}
-          className="rounded-full"
+          className="rounded-full self-start sm:self-auto shrink-0"
         >
           <ActionIcon className="w-4 h-4" />
           {actionLabel}

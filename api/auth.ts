@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { compare, hash } from 'bcryptjs';
 import { randomBytes } from 'node:crypto';
 import { createSession, destroySession, getCurrentUser } from './_lib/auth.js';
+import { getDevBypassUser, isDevAuthBypassEnabled } from './_lib/devAuth.js';
 import { prisma } from './_lib/db.js';
 import { parseJsonBody, sendMethodNotAllowed, sendServerError } from './_lib/http.js';
 
@@ -61,6 +62,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (action === 'me') {
       if (req.method !== 'GET') return sendMethodNotAllowed(res, ['GET']);
+      if (isDevAuthBypassEnabled(req)) {
+        return res.status(200).json({ user: getDevBypassUser() });
+      }
       const user = await getCurrentUser(req);
       return res.status(200).json({
         user: user

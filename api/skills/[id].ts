@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { requireAuth } from '../_lib/auth.js';
+import { getDevBypassUser, isDevAuthBypassEnabled } from '../_lib/devAuth.js';
 import { prisma } from '../_lib/db.js';
 import { parseJsonBody, sendMethodNotAllowed, sendServerError } from '../_lib/http.js';
 import { mapSkill } from '../_lib/mappers.js';
@@ -16,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const user = await requireAuth(req, res);
+    const user = isDevAuthBypassEnabled(req) ? getDevBypassUser() : await requireAuth(req, res);
     if (!user) return;
 
     if (req.method === 'PATCH') {
