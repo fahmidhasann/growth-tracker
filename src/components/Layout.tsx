@@ -26,12 +26,17 @@ export function Layout({ activeTab, setActiveTab, theme, setTheme, children }: L
   return (
     <div className="h-screen bg-zinc-950 text-zinc-50 flex flex-col md:flex-row font-sans overflow-hidden">
       {/* Sidebar for Desktop */}
-      <aside className="hidden md:flex flex-col w-64 border-r border-zinc-800 bg-zinc-950/50 p-4">
-        <div className="mb-8 px-4">
-          <h1 className="text-xl font-semibold tracking-tight text-zinc-100">Growth Tracker</h1>
-          <p className="text-xs text-zinc-500 mt-1">Track your learning journey</p>
+      <aside className="hidden md:flex flex-col w-64 border-r border-zinc-800/70 bg-gradient-to-b from-zinc-950 to-zinc-950/95 p-4">
+        <div className="mb-8 px-4 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/20 flex items-center justify-center shrink-0">
+            <Trophy className="w-4 h-4 text-amber-400" />
+          </div>
+          <div>
+            <h1 className="text-base font-semibold tracking-tight text-zinc-100 leading-none">Growth Tracker</h1>
+            <p className="text-[10px] text-zinc-500 mt-0.5">Track your learning journey</p>
+          </div>
         </div>
-        <nav aria-label="Main navigation" className="flex-1 space-y-1">
+        <nav aria-label="Main navigation" className="flex-1 space-y-0.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -42,20 +47,20 @@ export function Layout({ activeTab, setActiveTab, theme, setTheme, children }: L
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={item.label}
                 className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
+                  "w-full flex items-center gap-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40",
                   isActive
-                    ? "bg-zinc-800 text-zinc-100"
-                    : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+                    ? "bg-zinc-800/80 text-zinc-100 border-l-2 border-blue-500 pl-[calc(1rem-2px)] pr-4"
+                    : "pl-4 pr-4 text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
                 )}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className={cn("w-4 h-4 shrink-0", isActive && "text-blue-400")} />
                 {item.label}
               </button>
             );
           })}
         </nav>
-        <div className="mt-auto px-4 pt-4 border-t border-zinc-800/50">
+        <div className="mt-auto px-2 pt-4 border-t border-zinc-800/50">
           <button
             type="button"
             onClick={() => setTheme(nextTheme)}
@@ -66,7 +71,7 @@ export function Layout({ activeTab, setActiveTab, theme, setTheme, children }: L
             <ThemeIcon className="w-4 h-4" />
             <span className="text-xs font-medium capitalize">{nextTheme} mode</span>
           </button>
-          <p className="text-[10px] text-zinc-600">v1.1 — Cloud data sync enabled</p>
+          <p className="text-[10px] text-zinc-700 font-mono text-center">v1.1 · cloud sync</p>
         </div>
       </aside>
 
@@ -85,7 +90,9 @@ export function Layout({ activeTab, setActiveTab, theme, setTheme, children }: L
           aria-label={`Switch to ${nextTheme} mode`}
           className="flex flex-col items-center gap-1 p-2 rounded-lg transition-colors text-zinc-500 hover:text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
         >
-          <ThemeIcon className="w-5 h-5" />
+          <div className="relative">
+            <ThemeIcon className="w-5 h-5" />
+          </div>
           <span className="text-[10px] font-medium capitalize">Theme</span>
         </button>
         {navItems.map((item) => {
@@ -105,7 +112,12 @@ export function Layout({ activeTab, setActiveTab, theme, setTheme, children }: L
                   : "text-zinc-500 hover:text-zinc-300"
               )}
             >
-              <Icon className="w-5 h-5" />
+              <div className="relative">
+                <Icon className="w-5 h-5" />
+                {isActive && (
+                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-400" />
+                )}
+              </div>
               <span className="text-[10px] font-medium">{item.label}</span>
             </button>
           );
