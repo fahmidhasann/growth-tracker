@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useMemo, type FormEvent } from 'react';
 import { useStore } from '../store/useStore';
 import { format } from 'date-fns';
 import { FolderGit2, CheckCircle2, Clock, Pencil, Trash2 } from 'lucide-react';
@@ -12,6 +12,8 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
 import { Select } from '../components/ui/Select';
+
+type StatusFilter = 'all' | 'ongoing' | 'completed';
 
 const defaultForm = () => ({
   title: '',
@@ -31,6 +33,7 @@ export function Projects() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState(defaultForm());
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   const openAdd = () => {
     setEditingId(null);
@@ -65,9 +68,27 @@ export function Projects() {
     setFormData(defaultForm());
   };
 
-  const sortedProjects = [...projects].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  const sortedProjects = useMemo(
+    () => [...projects].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [projects]
   );
+
+  const filteredProjects = useMemo(
+    () =>
+      statusFilter === 'all'
+        ? sortedProjects
+        : sortedProjects.filter((p) => p.status === statusFilter),
+    [sortedProjects, statusFilter]
+  );
+
+  const ongoingCount = useMemo(() => projects.filter((p) => p.status === 'ongoing').length, [projects]);
+  const completedCount = useMemo(() => projects.filter((p) => p.status === 'completed').length, [projects]);
+
+  const filterOptions: { label: string; value: StatusFilter; count: number }[] = [
+    { label: 'All', value: 'all', count: projects.length },
+    { label: 'Ongoing', value: 'ongoing', count: ongoingCount },
+    { label: 'Completed', value: 'completed', count: completedCount },
+  ];
 
   return (
     <motion.div
@@ -147,9 +168,35 @@ export function Projects() {
         message="Are you sure you want to delete this project? This action cannot be undone."
       />
 
+      {/* Status filter tabs */}
+      {projects.length > 0 && (
+        <div className="flex items-center gap-1 p-1 bg-zinc-900/50 border border-zinc-800/50 rounded-xl w-fit">
+          {filterOptions.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setStatusFilter(opt.value)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                statusFilter === opt.value
+                  ? 'bg-zinc-800 text-zinc-100'
+                  : 'text-zinc-500 hover:text-zinc-300'
+              )}
+            >
+              {opt.label}
+              <span className={cn(
+                'text-xs px-1.5 py-0.5 rounded-full font-mono',
+                statusFilter === opt.value ? 'bg-zinc-700 text-zinc-300' : 'text-zinc-600'
+              )}>
+                {opt.count}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {sortedProjects.length > 0 ? (
-          sortedProjects.map((project, i) => (
+        {filteredProjects.length > 0 ? (
+          filteredProjects.map((project, i) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 12 }}
@@ -213,12 +260,18 @@ export function Projects() {
           ))
         ) : (
           <div className="col-span-full">
-            <EmptyState
-              icon={FolderGit2}
-              message="No projects added yet. Start building!"
-              actionLabel="Create your first project"
-              onAction={openAdd}
-            />
+            {projects.length === 0 ? (
+              <EmptyState
+                icon={FolderGit2}
+                message="No projects added yet. Start building!"
+                actionLabel="Create your first project"
+                onAction={openAdd}
+              />
+            ) : (
+              <div className="text-center py-16 text-zinc-500 text-sm">
+                No {statusFilter} projects found.
+              </div>
+            )}
           </div>
         )}
       </div>

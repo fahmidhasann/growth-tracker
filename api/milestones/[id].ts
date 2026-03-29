@@ -25,8 +25,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const body = parseJsonBody<UpdateMilestoneBody>(req);
       const data: Record<string, unknown> = {};
 
-      if (body.title !== undefined) data.title = body.title.trim();
-      if (body.description !== undefined) data.description = body.description.trim() || null;
+      if (body.title !== undefined) {
+        if (typeof body.title !== 'string' || !body.title.trim()) {
+          return res.status(400).json({ error: 'title must be a non-empty string' });
+        }
+        data.title = body.title.trim();
+      }
+      if (body.description !== undefined) {
+        if (typeof body.description !== 'string') {
+          return res.status(400).json({ error: 'description must be a string' });
+        }
+        data.description = body.description.trim() || null;
+      }
       if (body.date !== undefined) {
         if (!isValidDate(body.date)) {
           return res.status(400).json({ error: 'date must be valid' });

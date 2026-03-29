@@ -10,13 +10,10 @@ export function Heatmap() {
   const milestones = useStore((state) => state.milestones);
   const skills = useStore((state) => state.skills);
 
-  const today = new Date();
-  const startDate = subDays(today, 363);
-
-  const days = useMemo(
-    () => Array.from({ length: 364 }).map((_, i) => addDays(startDate, i)),
-    [startDate.getTime()]
-  );
+  const days = useMemo(() => {
+    const start = subDays(new Date(), 363);
+    return Array.from({ length: 364 }).map((_, i) => addDays(start, i));
+  }, []);
 
   const toDateKey = (value: string) => value.slice(0, 10);
 
@@ -36,6 +33,20 @@ export function Heatmap() {
 
     return acc;
   }, [logs, projects, milestones, skills]);
+
+  // Summary stats
+  const { totalActivities, activeDays } = useMemo(() => {
+    let total = 0;
+    let active = 0;
+    const dayKeys = new Set(days.map((d) => format(d, 'yyyy-MM-dd')));
+    for (const [key, count] of Object.entries(activityMap)) {
+      if (dayKeys.has(key)) {
+        total += count as number;
+        active++;
+      }
+    }
+    return { totalActivities: total, activeDays: active };
+  }, [activityMap, days]);
 
   // Generate month labels with their column positions
   const monthLabels = useMemo(() => {
@@ -64,7 +75,14 @@ export function Heatmap() {
 
   return (
     <div className="p-6 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl overflow-x-auto">
-      <h3 className="text-sm font-medium text-zinc-400 mb-4">Learning Activity</h3>
+      <div className="flex items-center justify-between mb-4 min-w-max">
+        <h3 className="text-sm font-semibold text-zinc-300">Learning Activity</h3>
+        <div className="flex items-center gap-3 text-xs text-zinc-500">
+          <span>{totalActivities} {totalActivities === 1 ? 'activity' : 'activities'} this year</span>
+          <span className="text-zinc-700">·</span>
+          <span>{activeDays} {activeDays === 1 ? 'day' : 'days'} active</span>
+        </div>
+      </div>
 
       {/* Month labels */}
       <div className="flex gap-1 min-w-max mb-1 pl-0">

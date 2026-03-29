@@ -22,6 +22,41 @@ function getTabFromHash(): Tab {
   return VALID_TABS.includes(hash) ? hash : 'dashboard';
 }
 
+function Spinner() {
+  return (
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative">
+          <div className="w-10 h-10 rounded-full border-2 border-zinc-800" />
+          <div className="absolute inset-0 w-10 h-10 rounded-full border-2 border-transparent border-t-zinc-400 animate-spin" />
+        </div>
+        <p className="text-zinc-600 text-xs font-mono tracking-wider">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+function DataLoadingSkeleton() {
+  return (
+    <div className="space-y-8 animate-pulse">
+      <div className="space-y-2">
+        <div className="h-8 w-40 bg-zinc-800/60 rounded-xl" />
+        <div className="h-4 w-64 bg-zinc-800/40 rounded-lg" />
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-28 bg-zinc-800/40 rounded-2xl" />
+        ))}
+      </div>
+      <div className="h-36 bg-zinc-800/40 rounded-2xl" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="h-80 bg-zinc-800/40 rounded-2xl" />
+        <div className="h-80 bg-zinc-800/40 rounded-2xl" />
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>(getTabFromHash);
   const [theme, setTheme] = useState<Theme>(() => {
@@ -81,11 +116,7 @@ export default function App() {
   }, [theme]);
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-300 flex items-center justify-center">
-        Checking session...
-      </div>
-    );
+    return <Spinner />;
   }
 
   if (!isAuthenticated) {
@@ -99,11 +130,7 @@ export default function App() {
       theme={theme}
       setTheme={setTheme}
     >
-      {!initialized && loading && (
-        <div className="min-h-[50vh] flex items-center justify-center text-zinc-400 text-sm">
-          Loading your data...
-        </div>
-      )}
+      {!initialized && loading && <DataLoadingSkeleton />}
       {!initialized && !loading && error && (
         <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4">
           <p className="text-zinc-400 text-sm">{error}</p>

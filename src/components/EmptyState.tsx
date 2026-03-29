@@ -1,4 +1,5 @@
 import { type LucideIcon } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Button } from './ui/Button';
 
 interface EmptyStateProps {
@@ -10,11 +11,20 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon: Icon, message, actionLabel, onAction }: EmptyStateProps) {
   return (
-    <div className="text-center py-20 bg-zinc-900/30 border border-zinc-800/50 rounded-3xl border-dashed">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className="text-center py-20 bg-zinc-900/30 border border-zinc-800/50 rounded-3xl border-dashed"
+    >
       {Icon && (
-        <div className="mx-auto w-12 h-12 rounded-full bg-zinc-800/50 flex items-center justify-center text-zinc-500 mb-4">
+        <motion.div
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+          className="mx-auto w-14 h-14 rounded-full bg-zinc-800/50 flex items-center justify-center text-zinc-500 mb-4"
+        >
           <Icon className="w-6 h-6" />
-        </div>
+        </motion.div>
       )}
       <p className="text-zinc-500">{message}</p>
       {actionLabel && onAction && (
@@ -22,6 +32,6 @@ export function EmptyState({ icon: Icon, message, actionLabel, onAction }: Empty
           {actionLabel}
         </Button>
       )}
-    </div>
+    </motion.div>
   );
 }

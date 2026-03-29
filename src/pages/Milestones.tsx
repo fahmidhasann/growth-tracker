@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useMemo, type FormEvent } from 'react';
 import { useStore } from '../store/useStore';
 import { format } from 'date-fns';
 import { Trophy, Pencil, Trash2 } from 'lucide-react';
@@ -64,8 +64,9 @@ export function Milestones() {
     setFormData(defaultForm());
   };
 
-  const sortedMilestones = [...milestones].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  const sortedMilestones = useMemo(
+    () => [...milestones].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [milestones]
   );
 
   return (
@@ -146,10 +147,12 @@ export function Milestones() {
                 transition={{ duration: 0.3, delay: i * 0.05 }}
                 className="relative mb-8 last:mb-0 group"
               >
-                <div className="absolute -left-8 top-1.5 w-8 h-8 rounded-full bg-zinc-900 border-2 border-amber-500 flex items-center justify-center z-10">
+                <div className="absolute -left-8 top-1.5 w-8 h-8 rounded-full bg-zinc-900 border-2 border-amber-500 flex items-center justify-center z-10 shadow-[0_0_12px_rgba(245,158,11,0.3)]">
                   <Trophy className="w-3.5 h-3.5 text-amber-500" />
                 </div>
-                <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-6">
+                <div className="relative bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-6 overflow-hidden">
+                  {/* Subtle amber left glow */}
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500/40 via-amber-500/20 to-transparent rounded-l-2xl" />
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-medium text-zinc-100">{milestone.title}</h3>
                     <div className="flex items-center gap-2">

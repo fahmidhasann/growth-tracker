@@ -32,14 +32,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(404).json({ error: 'Skill not found' });
       }
 
-      if (body.level !== undefined && (body.level < 1 || body.level > 5)) {
+      if (body.level !== undefined && (typeof body.level !== 'number' || body.level < 1 || body.level > 5)) {
         return res.status(400).json({ error: 'level must be between 1 and 5' });
+      }
+
+      if (body.name !== undefined) {
+        if (typeof body.name !== 'string' || !body.name.trim()) {
+          return res.status(400).json({ error: 'name must be a non-empty string' });
+        }
       }
 
       const updated = await prisma.skill.update({
         where: { id },
         data: {
-          ...(body.name !== undefined ? { name: body.name.trim() } : {}),
+          ...(body.name !== undefined ? { name: (body.name as string).trim() } : {}),
           ...(body.level !== undefined ? { level: body.level } : {}),
           ...(body.level !== undefined && body.level !== current.level
             ? {

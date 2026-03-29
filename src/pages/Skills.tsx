@@ -11,6 +11,14 @@ import { EmptyState } from '../components/EmptyState';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 
+const LEVEL_BAR_COLORS = [
+  'bg-zinc-500',
+  'bg-emerald-500',
+  'bg-blue-500',
+  'bg-purple-500',
+  'bg-amber-500',
+];
+
 export function Skills() {
   const skills = useStore((s) => s.skills);
   const addSkill = useStore((s) => s.addSkill);
@@ -139,6 +147,7 @@ export function Skills() {
         {skills.length > 0 ? (
           skills.map((skill, i) => {
             const currentLevel = SKILL_LEVELS.find((l) => l.value === skill.level);
+            const barColor = LEVEL_BAR_COLORS[skill.level - 1] ?? 'bg-blue-500';
             return (
               <motion.div
                 key={skill.id}
@@ -189,8 +198,8 @@ export function Skills() {
                         key={idx}
                         onClick={() => updateSkillLevel(skill.id, idx + 1)}
                         className={cn(
-                          'flex-1 h-2 rounded-full transition-colors',
-                          idx < skill.level ? 'bg-blue-500' : 'bg-zinc-800 hover:bg-zinc-700'
+                          'flex-1 h-2.5 rounded-full transition-all hover:opacity-90',
+                          idx < skill.level ? barColor : 'bg-zinc-800 hover:bg-zinc-700'
                         )}
                         aria-label={`Set ${skill.name} to level ${idx + 1}`}
                       />

@@ -17,7 +17,7 @@ export function PageHeader({
   onAction,
 }: PageHeaderProps) {
   return (
-    <header className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+    <header className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center border-b border-zinc-800/50 [.light_&]:border-zinc-200/50 pb-6">
       <div className="min-w-0">
         <h2 className="text-3xl font-semibold tracking-tight text-zinc-100">{title}</h2>
         <p className="text-zinc-400 mt-2 max-w-prose">{subtitle}</p>

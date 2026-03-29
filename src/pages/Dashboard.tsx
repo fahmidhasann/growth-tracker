@@ -4,7 +4,7 @@ import { Heatmap } from '../components/Heatmap';
 import { StatCard } from '../components/StatCard';
 import { FolderGit2, PenTool, Trophy, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import { motion } from 'motion/react';
 import { CHART_TOOLTIP_STYLE, CHART_AXIS_PROPS } from '../lib/constants';
 import type { Tab } from '../App';
@@ -38,6 +38,40 @@ export function Dashboard({ onNavigate }: DashboardProps) {
     [milestones]
   );
 
+  // Build activity map (same sources as Heatmap)
+  const activityMap = useMemo(() => {
+    const acc: Record<string, number> = {};
+    const toKey = (d: string) => d.slice(0, 10);
+    const inc = (d: string) => { if (d) acc[toKey(d)] = (acc[toKey(d)] || 0) + 1; };
+    logs.forEach((l) => inc(l.date));
+    projects.forEach((p) => inc(p.date));
+    milestones.forEach((m) => inc(m.date));
+    skills.forEach((s) => s.history.forEach((h) => inc(h.date)));
+    return acc;
+  }, [logs, projects, milestones, skills]);
+
+  // Calculate current streak (consecutive days with activity, counting back from today)
+  const currentStreak = useMemo(() => {
+    let streak = 0;
+    let cursor = new Date();
+    cursor.setHours(0, 0, 0, 0);
+    // If today has no activity, start check from yesterday
+    const todayKey = format(cursor, 'yyyy-MM-dd');
+    if (!activityMap[todayKey]) {
+      cursor = subDays(cursor, 1);
+    }
+    for (let i = 0; i < 365; i++) {
+      const key = format(cursor, 'yyyy-MM-dd');
+      if (activityMap[key]) {
+        streak++;
+        cursor = subDays(cursor, 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }, [activityMap]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -45,9 +79,22 @@ export function Dashboard({ onNavigate }: DashboardProps) {
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className="space-y-8"
     >
-      <header>
-        <h2 className="text-3xl font-semibold tracking-tight text-zinc-100">Dashboard</h2>
-        <p className="text-zinc-400 mt-2">Your learning journey at a glance.</p>
+      <header className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 border-b border-zinc-800/50 [.light_&]:border-zinc-200/50 pb-6">
+        <div>
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-100">Dashboard</h2>
+          <p className="text-zinc-400 mt-2">Your learning journey at a glance.</p>
+        </div>
+        {currentStreak > 0 ? (
+          <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full self-start shrink-0">
+            <span className="text-base leading-none">🔥</span>
+            <span className="text-sm font-semibold text-amber-400">{currentStreak}-day streak</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 border border-zinc-700/50 rounded-full self-start shrink-0">
+            <span className="text-base leading-none">✨</span>
+            <span className="text-sm font-medium text-zinc-400">Start your streak today</span>
+          </div>
+        )}
       </header>
 
       {/* Summary Cards */}
@@ -64,7 +111,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Skills Chart */}
         <div className="p-6 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl">
-          <h3 className="text-sm font-medium text-zinc-400 mb-6 uppercase tracking-wider">Skill Levels</h3>
+          <h3 className="text-sm font-semibold text-zinc-300 mb-6 border-l-2 border-blue-500 pl-3">Skill Levels</h3>
           <div className="h-64">
             {skillData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -91,7 +138,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
 
         {/* Mood Trend */}
         <div className="p-6 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl">
-          <h3 className="text-sm font-medium text-zinc-400 mb-6 uppercase tracking-wider">Recent Mood Trend</h3>
+          <h3 className="text-sm font-semibold text-zinc-300 mb-6 border-l-2 border-purple-500 pl-3">Recent Mood Trend</h3>
           <div className="h-64">
             {moodData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -119,12 +166,12 @@ export function Dashboard({ onNavigate }: DashboardProps) {
 
       {/* Timeline */}
       <div className="p-6 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl">
-        <h3 className="text-sm font-medium text-zinc-400 mb-6 uppercase tracking-wider">Journey Timeline</h3>
+        <h3 className="text-sm font-semibold text-zinc-300 mb-6 border-l-2 border-amber-500 pl-3">Journey Timeline</h3>
         <div className="space-y-8">
           {sortedMilestones.length > 0 ? (
             sortedMilestones.map((milestone) => (
               <div key={milestone.id} className="relative pl-8 before:absolute before:left-3 before:top-2 before:bottom-[-2rem] last:before:bottom-0 before:w-px before:bg-zinc-800">
-                <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-zinc-900 border-2 border-amber-500 flex items-center justify-center z-10">
+                <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-zinc-900 border-2 border-amber-500 flex items-center justify-center z-10 shadow-[0_0_10px_rgba(245,158,11,0.25)]">
                   <div className="w-2 h-2 rounded-full bg-amber-500" />
                 </div>
                 <div>
