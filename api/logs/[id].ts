@@ -33,11 +33,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
         data.date = new Date(body.date);
       }
-      if (body.learned !== undefined) data.learned = body.learned.trim();
-      if (body.built !== undefined) data.built = body.built.trim();
-      if (body.challenges !== undefined) data.challenges = body.challenges.trim();
+      if (body.learned !== undefined) {
+        if (typeof body.learned !== 'string' || !body.learned.trim()) {
+          return res.status(400).json({ error: 'learned must be a non-empty string' });
+        }
+        data.learned = body.learned.trim();
+      }
+      if (body.built !== undefined) {
+        if (typeof body.built !== 'string' || !body.built.trim()) {
+          return res.status(400).json({ error: 'built must be a non-empty string' });
+        }
+        data.built = body.built.trim();
+      }
+      if (body.challenges !== undefined) {
+        if (typeof body.challenges !== 'string' || !body.challenges.trim()) {
+          return res.status(400).json({ error: 'challenges must be a non-empty string' });
+        }
+        data.challenges = body.challenges.trim();
+      }
       if (body.mood !== undefined) {
-        if (body.mood < 1 || body.mood > 5) {
+        if (typeof body.mood !== 'number' || body.mood < 1 || body.mood > 5) {
           return res.status(400).json({ error: 'mood must be between 1 and 5' });
         }
         data.mood = body.mood;

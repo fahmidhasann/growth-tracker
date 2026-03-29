@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useMemo, type FormEvent } from 'react';
 import { useStore } from '../store/useStore';
 import { format } from 'date-fns';
 import { Trophy, Pencil, Trash2 } from 'lucide-react';
@@ -64,8 +64,9 @@ export function Milestones() {
     setFormData(defaultForm());
   };
 
-  const sortedMilestones = [...milestones].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  const sortedMilestones = useMemo(
+    () => [...milestones].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [milestones]
   );
 
   return (

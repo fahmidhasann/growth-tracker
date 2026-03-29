@@ -10,13 +10,10 @@ export function Heatmap() {
   const milestones = useStore((state) => state.milestones);
   const skills = useStore((state) => state.skills);
 
-  const today = new Date();
-  const startDate = subDays(today, 363);
-
-  const days = useMemo(
-    () => Array.from({ length: 364 }).map((_, i) => addDays(startDate, i)),
-    [startDate.getTime()]
-  );
+  const days = useMemo(() => {
+    const start = subDays(new Date(), 363);
+    return Array.from({ length: 364 }).map((_, i) => addDays(start, i));
+  }, []);
 
   const toDateKey = (value: string) => value.slice(0, 10);
 

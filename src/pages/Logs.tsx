@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useMemo, type FormEvent } from 'react';
 import { useStore } from '../store/useStore';
 import { format } from 'date-fns';
 import { BookOpen, Pencil, Trash2 } from 'lucide-react';
@@ -65,8 +65,9 @@ export function Logs() {
     setEditingId(null);
   };
 
-  const sortedLogs = [...logs].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  const sortedLogs = useMemo(
+    () => [...logs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [logs]
   );
 
   return (

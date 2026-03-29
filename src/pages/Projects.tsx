@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useMemo, type FormEvent } from 'react';
 import { useStore } from '../store/useStore';
 import { format } from 'date-fns';
 import { FolderGit2, CheckCircle2, Clock, Pencil, Trash2 } from 'lucide-react';
@@ -65,8 +65,9 @@ export function Projects() {
     setFormData(defaultForm());
   };
 
-  const sortedProjects = [...projects].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  const sortedProjects = useMemo(
+    () => [...projects].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [projects]
   );
 
   return (
