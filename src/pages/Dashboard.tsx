@@ -1,16 +1,25 @@
-import { useMemo } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { useStore } from '../store/useStore';
-import { Heatmap } from '../components/Heatmap';
 import { StatCard } from '../components/StatCard';
-import { FolderGit2, PenTool, Trophy, Activity } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { Activity, FolderGit2, PenTool, Trophy } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { motion } from 'motion/react';
-import { CHART_TOOLTIP_STYLE, CHART_AXIS_PROPS } from '../lib/constants';
 import type { Tab } from '../App';
 
 interface DashboardProps {
   onNavigate: (tab: Tab) => void;
+}
+
+const Heatmap = lazy(() => import('../components/Heatmap').then((module) => ({ default: module.Heatmap })));
+const SkillLevelsChart = lazy(() =>
+  import('../components/dashboard/SkillLevelsChart').then((module) => ({ default: module.SkillLevelsChart }))
+);
+const MoodTrendChart = lazy(() =>
+  import('../components/dashboard/MoodTrendChart').then((module) => ({ default: module.MoodTrendChart }))
+);
+
+function ChartSkeleton() {
+  return <div className="h-full animate-pulse rounded-[1.25rem] bg-[var(--surface-soft)]" />;
 }
 
 export function Dashboard({ onNavigate }: DashboardProps) {
@@ -77,57 +86,71 @@ export function Dashboard({ onNavigate }: DashboardProps) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="space-y-8"
+      className="space-y-6 sm:space-y-8"
     >
-      <header className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 border-b border-zinc-800/50 [.light_&]:border-zinc-200/50 pb-6">
-        <div>
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-100">Dashboard</h2>
-          <p className="text-zinc-400 mt-2">Your learning journey at a glance.</p>
+      <section className="gt-panel-strong rounded-[2rem] p-6 sm:p-7">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-3">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--text-soft)]">Overview</p>
+            <div>
+              <h2 className="text-3xl font-semibold tracking-tight text-[var(--text-primary)] sm:text-[2.3rem]">
+                Dashboard
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--text-muted)] sm:text-base">
+                A clear view of your learning activity, current skills, and recent momentum across the tracker.
+              </p>
+            </div>
+          </div>
+          <div
+            className={`inline-flex items-center gap-3 self-start rounded-[1.25rem] border px-4 py-3 text-sm ${
+              currentStreak > 0
+                ? 'border-amber-500/20 bg-amber-500/10 text-[var(--warning)]'
+                : 'border-[var(--border-subtle)] bg-[var(--surface-soft)] text-[var(--text-secondary)]'
+            }`}
+          >
+            <span className="text-base leading-none">{currentStreak > 0 ? '🔥' : '✨'}</span>
+            <div>
+              <p className="font-semibold">
+                {currentStreak > 0 ? `${currentStreak}-day streak` : 'Start your streak today'}
+              </p>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">
+                {currentStreak > 0 ? 'You have recorded activity on consecutive days.' : 'Add a log, skill, project, or milestone to begin.'}
+              </p>
+            </div>
+          </div>
         </div>
-        {currentStreak > 0 ? (
-          <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full self-start shrink-0">
-            <span className="text-base leading-none">🔥</span>
-            <span className="text-sm font-semibold text-amber-400">{currentStreak}-day streak</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 border border-zinc-700/50 rounded-full self-start shrink-0">
-            <span className="text-base leading-none">✨</span>
-            <span className="text-sm font-medium text-zinc-400">Start your streak today</span>
-          </div>
-        )}
-      </header>
+      </section>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         <StatCard icon={FolderGit2} color="emerald" count={projects.length} label="Projects" index={0} />
         <StatCard icon={PenTool} color="blue" count={skills.length} label="Skills" index={1} />
         <StatCard icon={Trophy} color="amber" count={milestones.length} label="Milestones" index={2} />
         <StatCard icon={Activity} color="purple" count={logs.length} label="Entries" index={3} />
       </div>
 
-      {/* Heatmap */}
-      <Heatmap />
+      <Suspense fallback={<div className="gt-panel h-72 animate-pulse rounded-[1.75rem] bg-[var(--surface-soft)]" />}>
+        <Heatmap />
+      </Suspense>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Skills Chart */}
-        <div className="p-6 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl">
-          <h3 className="text-sm font-semibold text-zinc-300 mb-6 border-l-2 border-blue-500 pl-3">Skill Levels</h3>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="gt-panel rounded-[1.75rem] p-5 sm:p-6">
+          <div className="mb-6 flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Skill levels</h3>
+              <p className="mt-1 text-sm text-[var(--text-muted)]">Track your current proficiency at a glance.</p>
+            </div>
+          </div>
           <div className="h-64">
             {skillData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={skillData}>
-                  <XAxis dataKey="name" {...CHART_AXIS_PROPS} />
-                  <YAxis {...CHART_AXIS_PROPS} domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} />
-                  <Tooltip cursor={{ fill: '#27272a' }} contentStyle={CHART_TOOLTIP_STYLE} />
-                  <Bar dataKey="level" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <Suspense fallback={<ChartSkeleton />}>
+                <SkillLevelsChart data={skillData} />
+              </Suspense>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center gap-3">
-                <p className="text-zinc-500 text-sm">No skills added yet.</p>
+              <div className="flex h-full flex-col items-center justify-center gap-3">
+                <p className="text-sm text-[var(--text-muted)]">No skills added yet.</p>
                 <button
                   onClick={() => onNavigate('skills')}
-                  className="text-blue-400 hover:text-blue-300 [.light_&]:text-blue-700 [.light_&]:hover:text-blue-800 text-sm font-medium transition-colors"
+                  className="text-sm font-medium text-[var(--accent-strong)] transition-colors hover:opacity-80"
                 >
                   Add your first skill &rarr;
                 </button>
@@ -136,25 +159,22 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           </div>
         </div>
 
-        {/* Mood Trend */}
-        <div className="p-6 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl">
-          <h3 className="text-sm font-semibold text-zinc-300 mb-6 border-l-2 border-purple-500 pl-3">Recent Mood Trend</h3>
+        <div className="gt-panel rounded-[1.75rem] p-5 sm:p-6">
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Recent mood trend</h3>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">A quick read on the last ten learning entries.</p>
+          </div>
           <div className="h-64">
             {moodData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={moodData}>
-                  <XAxis dataKey="date" {...CHART_AXIS_PROPS} />
-                  <YAxis {...CHART_AXIS_PROPS} domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} />
-                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
-                  <Line type="monotone" dataKey="mood" stroke="#a855f7" strokeWidth={2} dot={{ fill: '#a855f7', strokeWidth: 2 }} />
-                </LineChart>
-              </ResponsiveContainer>
+              <Suspense fallback={<ChartSkeleton />}>
+                <MoodTrendChart data={moodData} />
+              </Suspense>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center gap-3">
-                <p className="text-zinc-500 text-sm">No logs added yet.</p>
+              <div className="flex h-full flex-col items-center justify-center gap-3">
+                <p className="text-sm text-[var(--text-muted)]">No logs added yet.</p>
                 <button
                   onClick={() => onNavigate('logs')}
-                  className="text-purple-400 hover:text-purple-300 [.light_&]:text-purple-700 [.light_&]:hover:text-purple-800 text-sm font-medium transition-colors"
+                  className="text-sm font-medium text-[var(--accent-strong)] transition-colors hover:opacity-80"
                 >
                   Create your first log &rarr;
                 </button>
@@ -164,38 +184,45 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         </div>
       </div>
 
-      {/* Timeline */}
-      <div className="p-6 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl">
-        <h3 className="text-sm font-semibold text-zinc-300 mb-6 border-l-2 border-amber-500 pl-3">Journey Timeline</h3>
-        <div className="space-y-8">
+      <section className="gt-panel rounded-[1.75rem] p-5 sm:p-6">
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-[var(--text-primary)]">Journey timeline</h3>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">Recent milestones in reverse chronological order.</p>
+        </div>
+        <div className="space-y-5">
           {sortedMilestones.length > 0 ? (
             sortedMilestones.map((milestone) => (
-              <div key={milestone.id} className="relative pl-8 before:absolute before:left-3 before:top-2 before:bottom-[-2rem] last:before:bottom-0 before:w-px before:bg-zinc-800">
-                <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-zinc-900 border-2 border-amber-500 flex items-center justify-center z-10 shadow-[0_0_10px_rgba(245,158,11,0.25)]">
-                  <div className="w-2 h-2 rounded-full bg-amber-500" />
+              <div
+                key={milestone.id}
+                className="relative rounded-[1.5rem] border border-[var(--border-subtle)] bg-[var(--surface-soft)] p-4 sm:pl-16"
+              >
+                <div className="absolute left-4 top-4 hidden h-9 w-9 items-center justify-center rounded-2xl bg-amber-500/12 text-[var(--warning)] sm:flex">
+                  <div className="h-2.5 w-2.5 rounded-full bg-[var(--warning)]" />
                 </div>
                 <div>
-                  <p className="text-xs text-zinc-500 font-mono mb-1">{format(new Date(milestone.date), 'MMM dd, yyyy')}</p>
-                  <h4 className="text-lg font-medium text-zinc-200">{milestone.title}</h4>
+                  <p className="mb-1 text-xs font-mono text-[var(--text-soft)]">
+                    {format(new Date(milestone.date), 'MMM dd, yyyy')}
+                  </p>
+                  <h4 className="text-lg font-medium text-[var(--text-primary)]">{milestone.title}</h4>
                   {milestone.description && (
-                    <p className="text-zinc-400 mt-2 text-sm leading-relaxed">{milestone.description}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">{milestone.description}</p>
                   )}
                 </div>
               </div>
             ))
           ) : (
-            <div className="flex flex-col items-center justify-center py-8 gap-3">
-              <p className="text-zinc-500 text-sm">No milestones recorded yet.</p>
+            <div className="flex flex-col items-center justify-center gap-3 py-8">
+              <p className="text-sm text-[var(--text-muted)]">No milestones recorded yet.</p>
               <button
                 onClick={() => onNavigate('milestones')}
-                className="text-amber-400 hover:text-amber-300 [.light_&]:text-amber-700 [.light_&]:hover:text-amber-800 text-sm font-medium transition-colors"
+                className="text-sm font-medium text-[var(--accent-strong)] transition-colors hover:opacity-80"
               >
                 Add a milestone &rarr;
               </button>
             </div>
           )}
         </div>
-      </div>
+      </section>
     </motion.div>
   );
 }

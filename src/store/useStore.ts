@@ -5,6 +5,7 @@ interface AppState {
   initialized: boolean;
   loading: boolean;
   error: string | null;
+  clearError: () => void;
   logs: LogEntry[];
   skills: Skill[];
   projects: Project[];
@@ -66,6 +67,7 @@ export const useStore = create<AppState>()((set, get) => ({
   initialized: false,
   loading: false,
   error: null,
+  clearError: () => set({ error: null }),
   logs: [],
   skills: [],
   projects: [],

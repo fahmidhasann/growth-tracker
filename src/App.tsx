@@ -3,19 +3,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { Layout } from './components/Layout';
-import { Dashboard } from './pages/Dashboard';
-import { Logs } from './pages/Logs';
-import { Skills } from './pages/Skills';
-import { Projects } from './pages/Projects';
-import { Milestones } from './pages/Milestones';
 import { useStore } from './store/useStore';
 import { AuthScreen } from './components/AuthScreen';
+import { StatusBanner } from './components/StatusBanner';
 
 export type Tab = 'dashboard' | 'logs' | 'skills' | 'projects' | 'milestones';
 export type Theme = 'dark' | 'light';
 const VALID_TABS: Tab[] = ['dashboard', 'logs', 'skills', 'projects', 'milestones'];
+const Dashboard = lazy(() => import('./pages/Dashboard').then((module) => ({ default: module.Dashboard })));
+const Logs = lazy(() => import('./pages/Logs').then((module) => ({ default: module.Logs })));
+const Skills = lazy(() => import('./pages/Skills').then((module) => ({ default: module.Skills })));
+const Projects = lazy(() => import('./pages/Projects').then((module) => ({ default: module.Projects })));
+const Milestones = lazy(() =>
+  import('./pages/Milestones').then((module) => ({ default: module.Milestones }))
+);
 
 function getTabFromHash(): Tab {
   const hash = window.location.hash.replace('#', '') as Tab;
@@ -24,13 +27,13 @@ function getTabFromHash(): Tab {
 
 function Spinner() {
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+    <div className="gt-app-shell flex min-h-screen items-center justify-center px-4">
       <div className="flex flex-col items-center gap-4">
         <div className="relative">
-          <div className="w-10 h-10 rounded-full border-2 border-zinc-800" />
-          <div className="absolute inset-0 w-10 h-10 rounded-full border-2 border-transparent border-t-zinc-400 animate-spin" />
+          <div className="h-12 w-12 rounded-full border-2 border-[var(--border-subtle)]" />
+          <div className="absolute inset-0 h-12 w-12 animate-spin rounded-full border-2 border-transparent border-t-[var(--accent-strong)]" />
         </div>
-        <p className="text-zinc-600 text-xs font-mono tracking-wider">Loading...</p>
+        <p className="font-mono text-xs tracking-[0.2em] text-[var(--text-soft)]">LOADING</p>
       </div>
     </div>
   );
@@ -38,20 +41,20 @@ function Spinner() {
 
 function DataLoadingSkeleton() {
   return (
-    <div className="space-y-8 animate-pulse">
-      <div className="space-y-2">
-        <div className="h-8 w-40 bg-zinc-800/60 rounded-xl" />
-        <div className="h-4 w-64 bg-zinc-800/40 rounded-lg" />
+    <div className="animate-pulse space-y-6">
+      <div className="space-y-3">
+        <div className="h-8 w-40 rounded-2xl bg-[var(--surface-soft)]" />
+        <div className="h-4 w-72 rounded-xl bg-[var(--surface-soft)]" />
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-28 bg-zinc-800/40 rounded-2xl" />
+          <div key={i} className="gt-panel h-28 rounded-[1.5rem] bg-[var(--surface-soft)]" />
         ))}
       </div>
-      <div className="h-36 bg-zinc-800/40 rounded-2xl" />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="h-80 bg-zinc-800/40 rounded-2xl" />
-        <div className="h-80 bg-zinc-800/40 rounded-2xl" />
+      <div className="gt-panel h-40 rounded-[1.75rem] bg-[var(--surface-soft)]" />
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="gt-panel h-80 rounded-[1.75rem] bg-[var(--surface-soft)]" />
+        <div className="gt-panel h-80 rounded-[1.75rem] bg-[var(--surface-soft)]" />
       </div>
     </div>
   );
@@ -72,6 +75,7 @@ export default function App() {
   const loading = useStore((s) => s.loading);
   const initialized = useStore((s) => s.initialized);
   const error = useStore((s) => s.error);
+  const clearError = useStore((s) => s.clearError);
 
   const navigate = useCallback((tab: Tab) => {
     window.location.hash = tab;
@@ -113,7 +117,20 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.toggle('light', theme === 'light');
     window.localStorage.setItem('growth-tracker-theme', theme);
+
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    metaTheme?.setAttribute('content', theme === 'light' ? '#f3f6fb' : '#0b1220');
   }, [theme]);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await fetch('/api/auth?action=logout', { method: 'POST' });
+    } catch {
+      // Best effort; force a fresh unauthenticated load either way.
+    } finally {
+      window.location.assign(window.location.pathname);
+    }
+  }, []);
 
   if (authLoading) {
     return <Spinner />;
@@ -129,27 +146,29 @@ export default function App() {
       setActiveTab={navigate}
       theme={theme}
       setTheme={setTheme}
+      onLogout={() => void handleLogout()}
     >
+      {error ? <StatusBanner message={error} onDismiss={clearError} /> : null}
       {!initialized && loading && <DataLoadingSkeleton />}
       {!initialized && !loading && error && (
-        <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4">
-          <p className="text-zinc-400 text-sm">{error}</p>
+        <div className="gt-panel flex min-h-[50vh] flex-col items-center justify-center gap-4 rounded-[1.75rem] px-6 py-10 text-center">
+          <p className="text-sm text-[var(--text-secondary)]">{error}</p>
           <button
             onClick={() => void initialize()}
-            className="px-4 py-2 rounded-xl bg-zinc-800 text-zinc-200 text-sm hover:bg-zinc-700 transition-colors"
+            className="rounded-2xl bg-[var(--accent-strong)] px-4 py-2 text-sm font-medium text-white transition-colors hover:brightness-110 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring-focus)]"
           >
             Retry
           </button>
         </div>
       )}
       {initialized && (
-        <>
-      {activeTab === 'dashboard' && <Dashboard onNavigate={navigate} />}
-      {activeTab === 'logs' && <Logs />}
-      {activeTab === 'skills' && <Skills />}
-      {activeTab === 'projects' && <Projects />}
-      {activeTab === 'milestones' && <Milestones />}
-        </>
+        <Suspense fallback={<DataLoadingSkeleton />}>
+          {activeTab === 'dashboard' && <Dashboard onNavigate={navigate} />}
+          {activeTab === 'logs' && <Logs />}
+          {activeTab === 'skills' && <Skills />}
+          {activeTab === 'projects' && <Projects />}
+          {activeTab === 'milestones' && <Milestones />}
+        </Suspense>
       )}
     </Layout>
   );

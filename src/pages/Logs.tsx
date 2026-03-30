@@ -3,7 +3,7 @@ import { useStore } from '../store/useStore';
 import { format } from 'date-fns';
 import { BookOpen, Pencil, Trash2 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { getMoodEmoji } from '../lib/constants';
+import { getMoodEmoji, getMoodLabel } from '../lib/constants';
 import { motion } from 'motion/react';
 import { Modal } from '../components/Modal';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -31,6 +31,12 @@ export function Logs() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState(defaultForm());
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setFormData(defaultForm());
+  };
 
   const openAdd = () => {
     setEditingId(null);
@@ -60,9 +66,7 @@ export function Logs() {
     } else {
       addLog(payload);
     }
-    setIsModalOpen(false);
-    setFormData(defaultForm());
-    setEditingId(null);
+    closeModal();
   };
 
   const sortedLogs = useMemo(
@@ -79,24 +83,36 @@ export function Logs() {
     >
       <PageHeader
         title="Learning Logs"
-        subtitle="Record your weekly or monthly progress."
+        subtitle="Capture what you learned, built, and struggled with in one place."
         actionLabel="New Entry"
         onAction={openAdd}
       />
 
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={closeModal}
         title={editingId ? 'Edit Log Entry' : 'New Log Entry'}
         maxWidth="max-w-2xl"
+        description="Use this entry to capture what moved forward and how the work felt."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <Button variant="ghost" type="button" onClick={closeModal}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" form="log-form">
+              {editingId ? 'Update Entry' : 'Save Entry'}
+            </Button>
+          </div>
+        }
       >
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form id="log-form" onSubmit={handleSubmit} className="space-y-6">
           <Input
             label="Date"
             type="date"
             required
             value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+            hint="Entries are sorted by this date on your timeline."
           />
 
           <Textarea
@@ -127,35 +143,28 @@ export function Logs() {
           />
 
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-4">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-4">
               How did you feel? (Energy/Mood)
             </label>
-            <div className="flex gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
               {[1, 2, 3, 4, 5].map((level) => (
                 <button
                   key={level}
                   type="button"
                   onClick={() => setFormData({ ...formData, mood: level })}
                   className={cn(
-                    'flex-1 py-3 rounded-xl border transition-all text-center font-medium',
+                    'gt-panel-soft flex min-h-20 flex-col items-center justify-center gap-2 rounded-2xl px-3 py-3 text-center transition-all',
                     formData.mood === level
-                      ? 'bg-purple-500/20 border-purple-500 text-purple-300'
-                      : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:border-zinc-700'
+                      ? 'border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--text-primary)] shadow-[var(--shadow-soft)]'
+                      : 'text-[var(--text-muted)] hover:bg-[var(--surface-elevated)]'
                   )}
+                  aria-pressed={formData.mood === level}
                 >
-                  {getMoodEmoji(level)}
+                  <span className="text-xl">{getMoodEmoji(level)}</span>
+                  <span className="text-xs font-medium">{getMoodLabel(level)}</span>
                 </button>
               ))}
             </div>
-          </div>
-
-          <div className="pt-4 flex justify-end gap-4">
-            <Button variant="ghost" type="button" onClick={() => setIsModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" type="submit">
-              {editingId ? 'Update Entry' : 'Save Entry'}
-            </Button>
           </div>
         </form>
       </Modal>
@@ -180,57 +189,67 @@ export function Logs() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: i * 0.05 }}
               whileHover={{ y: -2 }}
-              className="bg-zinc-900/50 border border-zinc-800/50 rounded-3xl p-6 md:p-8 group"
+              className="gt-panel rounded-[1.75rem] p-5 sm:p-6"
             >
-              <div className="flex justify-between items-start mb-6">
-                <div className="font-mono text-sm text-zinc-500 tracking-wider">
+              <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="space-y-2">
+                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--text-soft)]">Entry</p>
+                  <div className="font-mono text-sm tracking-wider text-[var(--text-muted)]">
                   {format(new Date(log.date), 'MMMM dd, yyyy')}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => openEdit(log.id)}
-                      className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                      className="rounded-2xl p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-soft)] hover:text-[var(--text-primary)]"
                       aria-label="Edit log entry"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setDeleteId(log.id)}
-                      className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      className="rounded-2xl p-2 text-[var(--text-muted)] transition-colors hover:bg-red-500/10 hover:text-[var(--danger)]"
                       aria-label="Delete log entry"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <div className="flex items-center gap-2 bg-zinc-950 px-3 py-1.5 rounded-full border border-zinc-800">
-                    <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Mood</span>
-                    <span className="text-lg">{getMoodEmoji(log.mood)}</span>
+                  <div className="rounded-full border border-[var(--border-subtle)] bg-[var(--surface-soft)] px-3 py-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--text-soft)]">
+                        Mood
+                      </span>
+                      <span className="text-lg">{getMoodEmoji(log.mood)}</span>
+                      <span className="text-sm font-medium text-[var(--text-secondary)]">
+                        {getMoodLabel(log.mood)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                  <h4 className="text-sm font-medium text-emerald-400 [.light_&]:text-emerald-700 mb-3 uppercase tracking-wider flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 [.light_&]:bg-emerald-600" />
+              <div className="grid grid-cols-1 gap-3 xl:grid-cols-3">
+                <div className="rounded-[1.5rem] bg-[var(--surface-soft)] p-4">
+                  <h4 className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-emerald-500">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     Learned
                   </h4>
-                  <p className="text-zinc-300 leading-relaxed text-sm">{log.learned}</p>
+                  <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{log.learned}</p>
                 </div>
-                <div>
-                  <h4 className="text-sm font-medium text-blue-400 [.light_&]:text-blue-700 mb-3 uppercase tracking-wider flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400 [.light_&]:bg-blue-600" />
+                <div className="rounded-[1.5rem] bg-[var(--surface-soft)] p-4">
+                  <h4 className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-blue-500">
+                    <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
                     Built
                   </h4>
-                  <p className="text-zinc-300 leading-relaxed text-sm">{log.built}</p>
+                  <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{log.built}</p>
                 </div>
-                <div>
-                  <h4 className="text-sm font-medium text-amber-400 [.light_&]:text-amber-700 mb-3 uppercase tracking-wider flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 [.light_&]:bg-amber-600" />
+                <div className="rounded-[1.5rem] bg-[var(--surface-soft)] p-4">
+                  <h4 className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-amber-500">
+                    <div className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                     Challenges
                   </h4>
-                  <p className="text-zinc-300 leading-relaxed text-sm">{log.challenges}</p>
+                  <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{log.challenges}</p>
                 </div>
               </div>
             </motion.div>

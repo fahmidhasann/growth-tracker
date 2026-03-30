@@ -15,20 +15,20 @@ export function EmptyState({ icon: Icon, message, actionLabel, onAction }: Empty
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="text-center py-20 bg-zinc-900/30 border border-zinc-800/50 rounded-3xl border-dashed"
+      className="gt-panel flex flex-col items-center rounded-[1.75rem] border-dashed px-6 py-16 text-center"
     >
       {Icon && (
         <motion.div
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-          className="mx-auto w-14 h-14 rounded-full bg-zinc-800/50 flex items-center justify-center text-zinc-500 mb-4"
+          className="mb-5 flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-[var(--surface-soft)] text-[var(--text-muted)]"
         >
-          <Icon className="w-6 h-6" />
+          <Icon className="h-6 w-6" />
         </motion.div>
       )}
-      <p className="text-zinc-500">{message}</p>
+      <p className="max-w-md text-sm leading-relaxed text-[var(--text-muted)] sm:text-base">{message}</p>
       {actionLabel && onAction && (
-        <Button variant="secondary" size="sm" onClick={onAction} className="mt-4">
+        <Button variant="secondary" size="md" onClick={onAction} className="mt-5 rounded-2xl">
           {actionLabel}
         </Button>
       )}

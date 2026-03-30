@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils';
 import { motion } from 'motion/react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
-type ButtonSize = 'sm' | 'md';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -12,15 +12,20 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-zinc-100 text-zinc-900 hover:bg-white',
-  secondary: 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700',
-  danger: 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20',
-  ghost: 'text-zinc-400 hover:text-zinc-100',
+  primary:
+    'bg-[var(--accent-strong)] text-white hover:brightness-110 shadow-[0_12px_28px_rgba(37,99,235,0.24)]',
+  secondary:
+    'gt-panel text-[var(--text-primary)] hover:bg-[var(--surface-elevated)]',
+  danger:
+    'border border-red-500/20 bg-red-500/10 text-[var(--danger)] hover:bg-red-500/16',
+  ghost:
+    'text-[var(--text-muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--text-primary)]',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-sm rounded-lg',
-  md: 'px-6 py-3 rounded-xl',
+  sm: 'min-h-9 rounded-xl px-3.5 text-sm',
+  md: 'min-h-11 rounded-2xl px-4 py-2.5 text-sm',
+  lg: 'min-h-12 rounded-2xl px-5 py-3 text-sm',
 };
 
 export function Button({
@@ -36,10 +41,11 @@ export function Button({
       whileTap={{ scale: 0.98 }}
       disabled={disabled}
       className={cn(
-        'font-medium transition-colors inline-flex items-center justify-center gap-2',
+        'inline-flex items-center justify-center gap-2 font-medium transition-colors',
+        'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring-focus)]',
         variantStyles[variant],
         sizeStyles[size],
-        disabled && 'opacity-50 cursor-not-allowed',
+        disabled && 'cursor-not-allowed opacity-50 shadow-none',
         className
       )}
       {...(props as any)}

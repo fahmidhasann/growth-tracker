@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Trophy } from 'lucide-react';
+import { AlertCircle, Trophy } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 
@@ -17,6 +17,26 @@ export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const authError = params.get('authError');
+    const errorMessages: Record<string, string> = {
+      oauth_state_invalid: 'The Google sign-in session expired. Please try again.',
+      oauth_token_exchange_failed: 'Google sign-in could not be completed. Please try again.',
+      oauth_missing_id_token: 'Google sign-in returned incomplete data. Please try again.',
+      oauth_token_validation_failed: 'Google sign-in could not be verified. Please try again.',
+      oauth_identity_invalid: 'The selected Google account could not be verified.',
+      owner_account_mismatch: 'That Google account does not match the existing owner account.',
+      google_account_mismatch: 'This account is already linked to another Google profile.',
+    };
+
+    if (authError && errorMessages[authError]) {
+      setError(errorMessages[authError]);
+      params.delete('authError');
+      const nextQuery = params.toString();
+      const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`;
+      window.history.replaceState({}, '', nextUrl);
+    }
+
     const bootstrap = async () => {
       try {
         const response = await fetch('/api/auth?action=bootstrap');
@@ -27,7 +47,7 @@ export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
         setHasUsers(payload.hasUsers);
         setGoogleOAuthEnabled(Boolean(payload.googleOAuthEnabled));
       } catch {
-        setError('Unable to load authentication settings.');
+        setError((current) => current ?? 'Unable to load authentication settings.');
       } finally {
         setLoading(false);
       }
@@ -64,35 +84,44 @@ export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+      <div className="gt-app-shell flex min-h-screen items-center justify-center px-4">
         <div className="relative">
-          <div className="w-10 h-10 rounded-full border-2 border-zinc-800" />
-          <div className="absolute inset-0 w-10 h-10 rounded-full border-2 border-transparent border-t-zinc-400 animate-spin" />
+          <div className="h-12 w-12 rounded-full border-2 border-[var(--border-subtle)]" />
+          <div className="absolute inset-0 h-12 w-12 animate-spin rounded-full border-2 border-transparent border-t-[var(--accent-strong)]" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Decorative background */}
+    <div className="gt-app-shell relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 sm:p-6">
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-amber-500/3 blur-3xl" />
-        <div className="absolute top-1/4 right-1/4 w-64 h-64 rounded-full bg-blue-500/3 blur-3xl" />
+        <div className="absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--app-bg-accent)] blur-3xl" />
+        <div className="absolute right-[12%] top-[18%] h-56 w-56 rounded-full bg-[var(--app-bg-warm)] blur-3xl" />
       </div>
 
-      <div className="w-full max-w-md rounded-2xl border border-zinc-700/50 bg-zinc-900/60 p-8 space-y-6 shadow-2xl shadow-zinc-950/50 relative">
-        {/* Brand header */}
-        <div className="flex flex-col items-center text-center gap-3">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center">
-            <Trophy className="w-7 h-7 text-amber-400" />
+      <div className="gt-panel-strong relative w-full max-w-md space-y-6 rounded-[2rem] p-6 shadow-[var(--shadow-panel)] sm:p-8">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-amber-500/12 text-[var(--warning)]">
+            <Trophy className="h-7 w-7" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-100">Growth Tracker</h1>
-            <p className="text-zinc-500 text-sm mt-1">Your personal growth journal</p>
+            <h1 className="text-3xl font-semibold tracking-tight text-[var(--text-primary)]">Growth Tracker</h1>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">Your personal growth journal</p>
           </div>
-          <p className="text-zinc-400 text-sm">
+          <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
             {hasUsers ? 'Sign in to access your tracker.' : 'Create your owner account to secure your tracker.'}
+          </p>
+        </div>
+
+        <div className="rounded-[1.5rem] border border-[var(--border-subtle)] bg-[var(--surface-soft)] px-4 py-3">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--text-soft)]">
+            Access
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
+            {hasUsers
+              ? 'Use your owner account to continue. Google sign-in appears automatically when configured.'
+              : 'Your first account becomes the owner account for this tracker.'}
           </p>
         </div>
 
@@ -112,11 +141,19 @@ export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="At least 8 characters"
+            hint={!hasUsers ? 'Use at least 8 characters for the owner account password.' : undefined}
           />
 
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error ? (
+            <div className="rounded-2xl border border-red-500/18 bg-red-500/8 px-4 py-3 text-sm text-[var(--danger)]">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            </div>
+          ) : null}
 
-          <Button variant="primary" type="submit" className="w-full" disabled={submitting}>
+          <Button variant="primary" size="lg" type="submit" className="w-full" disabled={submitting}>
             {submitting ? 'Please wait...' : hasUsers ? 'Sign In' : 'Create Account'}
           </Button>
 
@@ -124,6 +161,7 @@ export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
             <Button
               variant="secondary"
               type="button"
+              size="lg"
               className="w-full"
               onClick={() => {
                 window.location.href = '/api/auth?action=google_start';

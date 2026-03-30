@@ -22,20 +22,16 @@ export function ConfirmDialog({
   variant = 'danger',
 }: ConfirmDialogProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="max-w-sm">
-      <div className="space-y-6">
-        <div className="flex gap-4 items-start">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-            variant === 'danger'
-              ? 'bg-red-500/10 text-red-400 [.light_&]:bg-red-100 [.light_&]:text-red-700'
-              : 'bg-amber-500/10 text-amber-400 [.light_&]:bg-amber-100 [.light_&]:text-amber-700'
-          }`}>
-            <AlertTriangle className="w-5 h-5" />
-          </div>
-          <p className="text-zinc-300 text-sm leading-relaxed">{message}</p>
-        </div>
-        <div className="flex justify-end gap-3">
-          <Button variant="ghost" size="md" onClick={onClose}>Cancel</Button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      maxWidth="max-w-sm"
+      footer={
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button variant="ghost" size="md" onClick={onClose}>
+            Cancel
+          </Button>
           <Button
             variant="danger"
             size="md"
@@ -46,6 +42,24 @@ export function ConfirmDialog({
           >
             {confirmLabel}
           </Button>
+        </div>
+      }
+    >
+      <div className="space-y-6">
+        <div className="flex items-start gap-4">
+          <div
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${
+              variant === 'danger'
+                ? 'bg-red-500/10 text-[var(--danger)]'
+                : 'bg-amber-500/10 text-[var(--warning)]'
+            }`}
+          >
+            <AlertTriangle className="w-5 h-5" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-[var(--text-primary)]">This action cannot be undone.</p>
+            <p className="text-sm leading-relaxed text-[var(--text-muted)]">{message}</p>
+          </div>
         </div>
       </div>
     </Modal>

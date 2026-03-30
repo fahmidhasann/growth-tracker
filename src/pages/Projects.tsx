@@ -35,6 +35,12 @@ export function Projects() {
   const [formData, setFormData] = useState(defaultForm());
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setFormData(defaultForm());
+  };
+
   const openAdd = () => {
     setEditingId(null);
     setFormData(defaultForm());
@@ -63,9 +69,7 @@ export function Projects() {
     } else {
       addProject(payload);
     }
-    setIsModalOpen(false);
-    setEditingId(null);
-    setFormData(defaultForm());
+    closeModal();
   };
 
   const sortedProjects = useMemo(
@@ -99,17 +103,28 @@ export function Projects() {
     >
       <PageHeader
         title="Projects"
-        subtitle="Showcase what you've built."
+        subtitle="Keep the projects list focused, readable, and easy to update from any device."
         actionLabel="New Project"
         onAction={openAdd}
       />
 
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={closeModal}
         title={editingId ? 'Edit Project' : 'New Project'}
+        description="Add a concise summary so project cards stay useful at a glance."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <Button variant="ghost" type="button" onClick={closeModal}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" form="project-form">
+              {editingId ? 'Update Project' : 'Save Project'}
+            </Button>
+          </div>
+        }
       >
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form id="project-form" onSubmit={handleSubmit} className="space-y-6">
           <Input
             label="Project Title"
             type="text"
@@ -117,6 +132,7 @@ export function Projects() {
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             placeholder="e.g. Personal Website, ML Model..."
+            hint="Short titles make the project grid easier to scan."
           />
 
           <Textarea
@@ -128,7 +144,7 @@ export function Projects() {
             placeholder="What did you build and what technologies did you use?"
           />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               label="Start Date"
               type="date"
@@ -145,15 +161,6 @@ export function Projects() {
               <option value="completed">Completed</option>
             </Select>
           </div>
-
-          <div className="pt-4 flex justify-end gap-4">
-            <Button variant="ghost" type="button" onClick={() => setIsModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" type="submit">
-              {editingId ? 'Update Project' : 'Save Project'}
-            </Button>
-          </div>
         </form>
       </Modal>
 
@@ -168,24 +175,25 @@ export function Projects() {
         message="Are you sure you want to delete this project? This action cannot be undone."
       />
 
-      {/* Status filter tabs */}
       {projects.length > 0 && (
-        <div className="flex items-center gap-1 p-1 bg-zinc-900/50 border border-zinc-800/50 rounded-xl w-fit">
+        <div className="flex flex-wrap items-center gap-2">
           {filterOptions.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setStatusFilter(opt.value)}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                'flex items-center gap-2 rounded-2xl px-3 py-2 text-sm font-medium transition-colors',
                 statusFilter === opt.value
-                  ? 'bg-zinc-800 text-zinc-100'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  ? 'gt-panel text-[var(--text-primary)]'
+                  : 'bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               )}
             >
               {opt.label}
               <span className={cn(
-                'text-xs px-1.5 py-0.5 rounded-full font-mono',
-                statusFilter === opt.value ? 'bg-zinc-700 text-zinc-300' : 'text-zinc-600'
+                'rounded-full px-2 py-0.5 font-mono text-[11px]',
+                statusFilter === opt.value
+                  ? 'bg-[var(--surface-elevated)] text-[var(--text-secondary)]'
+                  : 'text-[var(--text-soft)]'
               )}>
                 {opt.count}
               </span>
@@ -194,7 +202,7 @@ export function Projects() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {filteredProjects.length > 0 ? (
           filteredProjects.map((project, i) => (
             <motion.div
@@ -203,32 +211,32 @@ export function Projects() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: i * 0.05 }}
               whileHover={{ y: -2 }}
-              className="bg-zinc-900/50 border border-zinc-800/50 rounded-3xl p-6 flex flex-col h-full group"
+              className="gt-panel flex h-full flex-col rounded-[1.75rem] p-5"
             >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-400">
-                    <FolderGit2 className="w-5 h-5" />
+              <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--surface-soft)] text-[var(--text-muted)]">
+                    <FolderGit2 className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-medium text-zinc-100">{project.title}</h3>
-                    <p className="text-xs font-mono text-zinc-500 mt-1">
+                    <h3 className="text-xl font-semibold text-[var(--text-primary)]">{project.title}</h3>
+                    <p className="mt-1 text-xs font-mono text-[var(--text-soft)]">
                       {format(new Date(project.date), 'MMM dd, yyyy')}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
+                  <div className="flex items-center gap-1">
                     <button
                       onClick={() => openEdit(project.id)}
-                      className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                      className="rounded-2xl p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-soft)] hover:text-[var(--text-primary)]"
                       aria-label={`Edit ${project.title}`}
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setDeleteId(project.id)}
-                      className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      className="rounded-2xl p-2 text-[var(--text-muted)] transition-colors hover:bg-red-500/10 hover:text-[var(--danger)]"
                       aria-label={`Delete ${project.title}`}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -239,10 +247,10 @@ export function Projects() {
                       updateProjectStatus(project.id, project.status === 'ongoing' ? 'completed' : 'ongoing')
                     }
                     className={cn(
-                      'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider transition-colors',
+                      'flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-colors',
                       project.status === 'completed'
-                        ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 [.light_&]:bg-emerald-100 [.light_&]:text-emerald-700 [.light_&]:hover:bg-emerald-200'
-                        : 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 [.light_&]:bg-amber-100 [.light_&]:text-amber-700 [.light_&]:hover:bg-amber-200'
+                        ? 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/16'
+                        : 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/16'
                     )}
                   >
                     {project.status === 'completed' ? (
@@ -255,7 +263,14 @@ export function Projects() {
                 </div>
               </div>
 
-              <p className="text-zinc-400 text-sm leading-relaxed flex-1">{project.description}</p>
+              <div className="flex flex-1 flex-col gap-4">
+                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{project.description}</p>
+                <div className="mt-auto rounded-[1.5rem] bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--text-muted)]">
+                  {project.status === 'completed'
+                    ? 'Marked as completed. Tap the badge if the project becomes active again.'
+                    : 'Active project. Tap the badge when you want to mark it completed.'}
+                </div>
+              </div>
             </motion.div>
           ))
         ) : (
@@ -268,7 +283,7 @@ export function Projects() {
                 onAction={openAdd}
               />
             ) : (
-              <div className="text-center py-16 text-zinc-500 text-sm">
+              <div className="py-16 text-center text-sm text-[var(--text-muted)]">
                 No {statusFilter} projects found.
               </div>
             )}

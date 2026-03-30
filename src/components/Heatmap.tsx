@@ -74,31 +74,35 @@ export function Heatmap() {
   };
 
   return (
-    <div className="p-6 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl overflow-x-auto">
-      <div className="flex items-center justify-between mb-4 min-w-max">
-        <h3 className="text-sm font-semibold text-zinc-300">Learning Activity</h3>
-        <div className="flex items-center gap-3 text-xs text-zinc-500">
+    <div className="gt-panel overflow-hidden rounded-[1.75rem] p-5 sm:p-6">
+      <div className="mb-4 flex min-w-max flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="text-sm font-semibold text-[var(--text-primary)]">Learning activity</h3>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">Your last 52 weeks of logged growth.</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)]">
           <span>{totalActivities} {totalActivities === 1 ? 'activity' : 'activities'} this year</span>
-          <span className="text-zinc-700">·</span>
+          <span className="text-[var(--text-soft)]">·</span>
           <span>{activeDays} {activeDays === 1 ? 'day' : 'days'} active</span>
         </div>
       </div>
 
-      {/* Month labels */}
-      <div className="flex gap-1 min-w-max mb-1 pl-0">
+      <div className="overflow-x-auto pb-2">
+        <div className="min-w-max">
+          <div className="mb-1 flex gap-1 pl-0">
         {Array.from({ length: 52 }).map((_, weekIndex) => {
           const label = monthLabels.find((m) => m.col === weekIndex);
           return (
-            <div key={weekIndex} className="w-3 text-center">
+                <div key={weekIndex} className="w-3 text-center">
               {label && (
-                <span className="text-[9px] text-zinc-500 font-medium">{label.label}</span>
+                    <span className="text-[9px] font-medium text-[var(--text-soft)]">{label.label}</span>
               )}
             </div>
           );
         })}
-      </div>
+          </div>
 
-      <div className="flex gap-1 min-w-max">
+          <div className="flex min-w-max gap-1">
         {Array.from({ length: 52 }).map((_, weekIndex) => (
           <div key={weekIndex} className="flex flex-col gap-1">
             {Array.from({ length: 7 }).map((_, dayIndex) => {
@@ -112,21 +116,22 @@ export function Heatmap() {
                 <div
                   key={dateStr}
                   title={`${format(day, 'MMM dd, yyyy')}: ${count} ${count === 1 ? 'activity' : 'activities'}`}
-                  className={cn(
-                    'w-3 h-3 rounded-sm transition-colors',
-                    getIntensity(count)
-                  )}
+                  className={cn('h-3 w-3 rounded-[4px] transition-transform hover:scale-110')}
+                  style={{ backgroundColor: getIntensity(count) }}
                 />
               );
             })}
           </div>
         ))}
+          </div>
+        </div>
       </div>
-      <div className="mt-4 flex items-center gap-2 text-xs text-zinc-500 justify-end">
+
+      <div className="mt-4 flex items-center justify-end gap-2 text-xs text-[var(--text-muted)]">
         <span>Less</span>
         <div className="flex gap-1">
           {HEATMAP_COLORS.map((color, i) => (
-            <div key={i} className={`w-3 h-3 rounded-sm ${color}`} />
+            <div key={i} className="h-3 w-3 rounded-[4px]" style={{ backgroundColor: color }} />
           ))}
         </div>
         <span>More</span>

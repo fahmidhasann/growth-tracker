@@ -11,20 +11,20 @@ interface StatCardProps {
 
 const colorMap: Record<string, { bg: string; text: string }> = {
   emerald: {
-    bg: 'bg-emerald-500/10 [.light_&]:bg-emerald-100',
-    text: 'text-emerald-400 [.light_&]:text-emerald-700',
+    bg: 'bg-emerald-500/10',
+    text: 'text-emerald-500',
   },
   blue: {
-    bg: 'bg-blue-500/10 [.light_&]:bg-blue-100',
-    text: 'text-blue-400 [.light_&]:text-blue-700',
+    bg: 'bg-blue-500/10',
+    text: 'text-blue-500',
   },
   amber: {
-    bg: 'bg-amber-500/10 [.light_&]:bg-amber-100',
-    text: 'text-amber-400 [.light_&]:text-amber-700',
+    bg: 'bg-amber-500/10',
+    text: 'text-amber-500',
   },
   purple: {
-    bg: 'bg-purple-500/10 [.light_&]:bg-purple-100',
-    text: 'text-purple-400 [.light_&]:text-purple-700',
+    bg: 'bg-violet-500/10',
+    text: 'text-violet-500',
   },
 };
 
@@ -36,14 +36,14 @@ export function StatCard({ icon: Icon, color, count, label, index = 0 }: StatCar
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
       whileHover={{ y: -2 }}
-      className="p-6 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl flex flex-col gap-3"
+      className="gt-panel flex flex-col gap-4 rounded-[1.5rem] p-5"
     >
-      <div className={`w-10 h-10 rounded-full ${colors.bg} flex items-center justify-center ${colors.text}`}>
-        <Icon className="w-5 h-5" />
+      <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${colors.bg} ${colors.text}`}>
+        <Icon className="h-5 w-5" />
       </div>
-      <div>
-        <p className="text-3xl font-light text-zinc-100">{count}</p>
-        <p className="text-sm font-medium text-zinc-500 uppercase tracking-wider mt-1">{label}</p>
+      <div className="space-y-1">
+        <p className="text-3xl font-semibold tracking-tight text-[var(--text-primary)]">{count}</p>
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">{label}</p>
       </div>
     </motion.div>
   );

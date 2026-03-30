@@ -3,27 +3,32 @@ import { cn } from '../../lib/utils';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  hint?: string;
+  error?: string;
 }
 
-export function Input({ label, className, id, ...props }: InputProps) {
+export function Input({ label, hint, error, className, id, ...props }: InputProps) {
   const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
   return (
-    <div>
+    <div className="space-y-2">
       {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-zinc-400 mb-2">
+        <label htmlFor={inputId} className="block text-sm font-medium text-[var(--text-secondary)]">
           {label}
         </label>
       )}
       <input
         id={inputId}
         className={cn(
-          "w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:border-zinc-600",
-          "transition-all placeholder:text-zinc-600",
+          'gt-field w-full rounded-2xl px-4 py-3 text-sm transition-all placeholder:text-[var(--text-soft)]',
+          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring-focus)] focus-visible:border-[var(--border-strong)]',
+          error && 'border-red-500/40 focus-visible:border-red-500/40 focus-visible:ring-red-500/15',
           className
         )}
+        aria-invalid={error ? 'true' : undefined}
         {...props}
       />
+      {error ? <p className="text-sm text-[var(--danger)]">{error}</p> : null}
+      {!error && hint ? <p className="text-sm text-[var(--text-muted)]">{hint}</p> : null}
     </div>
   );
 }

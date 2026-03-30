@@ -12,10 +12,10 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 
 const LEVEL_BAR_COLORS = [
-  'bg-zinc-500',
+  'bg-[var(--text-soft)]',
   'bg-emerald-500',
   'bg-blue-500',
-  'bg-purple-500',
+  'bg-violet-500',
   'bg-amber-500',
 ];
 
@@ -30,6 +30,12 @@ export function Skills() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: '', level: 1 });
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setFormData({ name: '', level: 1 });
+  };
 
   const openAdd = () => {
     setEditingId(null);
@@ -54,9 +60,7 @@ export function Skills() {
     } else {
       addSkill(formData);
     }
-    setIsModalOpen(false);
-    setEditingId(null);
-    setFormData({ name: '', level: 1 });
+    closeModal();
   };
 
   return (
@@ -68,18 +72,29 @@ export function Skills() {
     >
       <PageHeader
         title="Skills"
-        subtitle="Track your technical proficiency."
+        subtitle="Track how your proficiency changes over time and keep level updates easy to maintain."
         actionLabel="Add Skill"
         onAction={openAdd}
       />
 
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={closeModal}
         title={editingId ? 'Edit Skill' : 'New Skill'}
         maxWidth="max-w-md"
+        description="Add a skill once, then keep the level control current as your confidence changes."
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <Button variant="ghost" type="button" onClick={closeModal}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" form="skill-form">
+              {editingId ? 'Update Skill' : 'Add Skill'}
+            </Button>
+          </div>
+        }
       >
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form id="skill-form" onSubmit={handleSubmit} className="space-y-6">
           <Input
             label="Skill Name"
             type="text"
@@ -87,10 +102,11 @@ export function Skills() {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="e.g. Python, PyTorch, SQL..."
+            hint="Keep names short so cards and charts stay readable."
           />
 
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-4">Current Level</label>
+            <label className="mb-4 block text-sm font-medium text-[var(--text-secondary)]">Current Level</label>
             <div className="space-y-2">
               {SKILL_LEVELS.map((level) => (
                 <button
@@ -98,10 +114,10 @@ export function Skills() {
                   type="button"
                   onClick={() => setFormData({ ...formData, level: level.value })}
                   className={cn(
-                    'w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all',
+                    'gt-panel-soft flex w-full items-center justify-between rounded-2xl px-4 py-3 transition-all',
                     formData.level === level.value
-                      ? 'bg-zinc-800 border-zinc-600 text-zinc-100'
-                      : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:border-zinc-700'
+                      ? 'border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--text-primary)] shadow-[var(--shadow-soft)]'
+                      : 'text-[var(--text-muted)] hover:bg-[var(--surface-elevated)]'
                   )}
                 >
                   <span className="font-medium">{level.label}</span>
@@ -111,7 +127,7 @@ export function Skills() {
                         key={i}
                         className={cn(
                           'w-2 h-2 rounded-full',
-                          i < level.value ? 'bg-current' : 'bg-zinc-800'
+                          i < level.value ? 'bg-current' : 'bg-[var(--border-subtle)]'
                         )}
                       />
                     ))}
@@ -119,15 +135,6 @@ export function Skills() {
                 </button>
               ))}
             </div>
-          </div>
-
-          <div className="pt-4 flex justify-end gap-4">
-            <Button variant="ghost" type="button" onClick={() => setIsModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" type="submit">
-              {editingId ? 'Update Skill' : 'Add Skill'}
-            </Button>
           </div>
         </form>
       </Modal>
@@ -143,7 +150,7 @@ export function Skills() {
         message="Are you sure you want to delete this skill? All level history will be lost."
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {skills.length > 0 ? (
           skills.map((skill, i) => {
             const currentLevel = SKILL_LEVELS.find((l) => l.value === skill.level);
@@ -155,22 +162,25 @@ export function Skills() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: i * 0.05 }}
                 whileHover={{ y: -2 }}
-                className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-6 flex flex-col gap-6 group"
+                className="gt-panel flex flex-col gap-5 rounded-[1.75rem] p-5"
               >
-                <div className="flex justify-between items-start">
-                  <h3 className="text-xl font-medium text-zinc-100">{skill.name}</h3>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--text-soft)]">Skill</p>
+                    <h3 className="mt-2 text-xl font-semibold text-[var(--text-primary)]">{skill.name}</h3>
+                  </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1">
                       <button
                         onClick={() => openEdit(skill.id)}
-                        className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                        className="rounded-2xl p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-soft)] hover:text-[var(--text-primary)]"
                         aria-label={`Edit ${skill.name}`}
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => setDeleteId(skill.id)}
-                        className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        className="rounded-2xl p-2 text-[var(--text-muted)] transition-colors hover:bg-red-500/10 hover:text-[var(--danger)]"
                         aria-label={`Delete ${skill.name}`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -178,7 +188,7 @@ export function Skills() {
                     </div>
                     <div
                       className={cn(
-                        'px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider',
+                        'px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-[0.18em]',
                         currentLevel?.color
                       )}
                     >
@@ -187,30 +197,36 @@ export function Skills() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-zinc-500 font-medium uppercase tracking-wider">
+                <div className="rounded-[1.5rem] bg-[var(--surface-soft)] p-4">
+                  <div className="mb-3 flex justify-between text-xs font-medium uppercase tracking-[0.18em] text-[var(--text-soft)]">
                     <span>Level</span>
                     <span>{skill.level} / 5</span>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="grid grid-cols-5 gap-2">
                     {Array.from({ length: 5 }).map((_, idx) => (
                       <button
                         key={idx}
                         onClick={() => updateSkillLevel(skill.id, idx + 1)}
                         className={cn(
-                          'flex-1 h-2.5 rounded-full transition-all hover:opacity-90',
-                          idx < skill.level ? barColor : 'bg-zinc-800 hover:bg-zinc-700'
+                          'flex min-h-12 items-center justify-center rounded-2xl text-sm font-semibold transition-all',
+                          idx < skill.level
+                            ? `${barColor} text-white shadow-[var(--shadow-soft)]`
+                            : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:bg-[var(--surface-panel)]'
                         )}
                         aria-label={`Set ${skill.name} to level ${idx + 1}`}
-                      />
+                      >
+                        {idx + 1}
+                      </button>
                     ))}
                   </div>
                 </div>
 
                 {skill.history.length > 1 && (
-                  <div className="flex items-center gap-2 text-xs text-zinc-500 mt-auto pt-4 border-t border-zinc-800/50">
+                  <div className="mt-auto flex items-center gap-2 border-t gt-hairline pt-4 text-xs text-[var(--text-muted)]">
                     <TrendingUp className="w-3 h-3" />
-                    <span>Started at level {skill.history[0].level}</span>
+                    <span>
+                      Started at level {skill.history[0].level} • {skill.history.length} recorded updates
+                    </span>
                   </div>
                 )}
               </motion.div>

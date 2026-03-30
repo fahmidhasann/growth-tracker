@@ -17,17 +17,20 @@ export function PageHeader({
   onAction,
 }: PageHeaderProps) {
   return (
-    <header className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center border-b border-zinc-800/50 [.light_&]:border-zinc-200/50 pb-6">
+    <header className="flex flex-col gap-4 border-b gt-hairline pb-6 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <h2 className="text-3xl font-semibold tracking-tight text-zinc-100">{title}</h2>
-        <p className="text-zinc-400 mt-2 max-w-prose">{subtitle}</p>
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--text-soft)]">Workspace</p>
+        <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[var(--text-primary)] sm:text-[2rem]">
+          {title}
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--text-muted)] sm:text-base">{subtitle}</p>
       </div>
       {actionLabel && onAction && (
         <Button
           variant="primary"
-          size="md"
+          size="lg"
           onClick={onAction}
-          className="rounded-full self-start sm:self-auto shrink-0"
+          className="self-start shrink-0 rounded-2xl sm:self-auto"
         >
           <ActionIcon className="w-4 h-4" />
           {actionLabel}

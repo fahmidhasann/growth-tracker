@@ -1,43 +1,124 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
 :root {
   color-scheme: dark;
-  --scrollbar-track: #18181b;
-  --scrollbar-thumb: #3f3f46;
-  --scrollbar-thumb-hover: #52525b;
+  --app-bg: #0b1220;
+  --app-bg-accent: rgba(37, 99, 235, 0.14);
+  --app-bg-warm: rgba(245, 158, 11, 0.12);
+  --surface-base: rgba(13, 19, 33, 0.88);
+  --surface-panel: rgba(18, 26, 42, 0.82);
+  --surface-elevated: rgba(25, 35, 56, 0.92);
+  --surface-strong: rgba(11, 17, 29, 0.98);
+  --surface-soft: rgba(148, 163, 184, 0.09);
+  --border-subtle: rgba(148, 163, 184, 0.18);
+  --border-strong: rgba(191, 219, 254, 0.24);
+  --text-primary: #f8fafc;
+  --text-secondary: #d4dbe7;
+  --text-muted: #9aa9bf;
+  --text-soft: #6c7b91;
+  --shadow-soft: 0 18px 40px rgba(3, 7, 18, 0.24);
+  --shadow-panel: 0 24px 64px rgba(2, 6, 23, 0.36);
+  --ring-focus: rgba(96, 165, 250, 0.34);
+  --accent: #7dd3fc;
+  --accent-strong: #3b82f6;
+  --accent-contrast: #08101a;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #fb7185;
+  --chart-axis: #8ea0bc;
+  --chart-tooltip-bg: rgba(15, 23, 42, 0.96);
+  --chart-tooltip-border: rgba(148, 163, 184, 0.22);
+  --heat-0: rgba(71, 85, 105, 0.24);
+  --heat-1: rgba(52, 211, 153, 0.26);
+  --heat-2: rgba(52, 211, 153, 0.44);
+  --heat-3: rgba(16, 185, 129, 0.68);
+  --heat-4: rgba(5, 150, 105, 0.92);
+  --scrollbar-track: #101827;
+  --scrollbar-thumb: #334155;
+  --scrollbar-thumb-hover: #475569;
   --selection-bg: rgba(59, 130, 246, 0.3);
-  --selection-text: #f4f4f5;
-  --date-picker-filter: invert(0.7);
+  --selection-text: #f8fafc;
+  --date-picker-filter: invert(0.78);
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 html.light {
   color-scheme: light;
-  --scrollbar-track: #f4f4f5;
-  --scrollbar-thumb: #a1a1aa;
-  --scrollbar-thumb-hover: #71717a;
-  --selection-bg: rgba(37, 99, 235, 0.2);
-  --selection-text: #18181b;
-  --date-picker-filter: invert(0.35);
-  --color-zinc-50: #09090b;
-  --color-zinc-100: #18181b;
-  --color-zinc-200: #27272a;
-  --color-zinc-300: #3f3f46;
-  --color-zinc-400: #52525b;
-  --color-zinc-500: #71717a;
-  --color-zinc-600: #a1a1aa;
-  --color-zinc-700: #d4d4d8;
-  --color-zinc-800: #e4e4e7;
-  --color-zinc-900: #f4f4f5;
-  --color-zinc-950: #fafafa;
+  --app-bg: #f3f6fb;
+  --app-bg-accent: rgba(59, 130, 246, 0.12);
+  --app-bg-warm: rgba(245, 158, 11, 0.1);
+  --surface-base: rgba(255, 255, 255, 0.88);
+  --surface-panel: rgba(255, 255, 255, 0.78);
+  --surface-elevated: rgba(255, 255, 255, 0.96);
+  --surface-strong: rgba(248, 250, 252, 0.98);
+  --surface-soft: rgba(15, 23, 42, 0.04);
+  --border-subtle: rgba(100, 116, 139, 0.16);
+  --border-strong: rgba(59, 130, 246, 0.2);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-soft: #94a3b8;
+  --shadow-soft: 0 16px 36px rgba(148, 163, 184, 0.18);
+  --shadow-panel: 0 20px 52px rgba(148, 163, 184, 0.22);
+  --ring-focus: rgba(37, 99, 235, 0.2);
+  --accent: #2563eb;
+  --accent-strong: #1d4ed8;
+  --accent-contrast: #eff6ff;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #e11d48;
+  --chart-axis: #64748b;
+  --chart-tooltip-bg: rgba(255, 255, 255, 0.98);
+  --chart-tooltip-border: rgba(148, 163, 184, 0.2);
+  --heat-0: rgba(148, 163, 184, 0.2);
+  --heat-1: rgba(16, 185, 129, 0.22);
+  --heat-2: rgba(16, 185, 129, 0.34);
+  --heat-3: rgba(5, 150, 105, 0.56);
+  --heat-4: rgba(4, 120, 87, 0.8);
+  --scrollbar-track: #e2e8f0;
+  --scrollbar-thumb: #94a3b8;
+  --scrollbar-thumb-hover: #64748b;
+  --selection-bg: rgba(37, 99, 235, 0.18);
+  --selection-text: #0f172a;
+  --date-picker-filter: invert(0.26);
 }
 
-/* Dark scrollbar */
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, var(--app-bg-accent), transparent 28%),
+    radial-gradient(circle at top right, var(--app-bg-warm), transparent 22%),
+    linear-gradient(180deg, var(--app-bg), color-mix(in srgb, var(--app-bg) 88%, black));
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  border-color: var(--border-subtle);
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -56,18 +137,60 @@ html.light {
   background: var(--scrollbar-thumb-hover);
 }
 
-/* Selection */
 ::selection {
   background: var(--selection-bg);
   color: var(--selection-text);
 }
 
-/* Smooth scroll */
 html {
   scroll-behavior: smooth;
 }
 
-/* Date input dark theme */
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: var(--date-picker-filter);
+}
+
+@layer components {
+  .gt-app-shell {
+    min-height: 100vh;
+    color: var(--text-primary);
+  }
+
+  .gt-panel {
+    background: var(--surface-panel);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(18px);
+  }
+
+  .gt-panel-strong {
+    background: var(--surface-strong);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-panel);
+    backdrop-filter: blur(24px);
+  }
+
+  .gt-panel-soft {
+    background: var(--surface-soft);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .gt-field {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .gt-hairline {
+    border-color: var(--border-subtle);
+  }
+
+  .gt-safe-top {
+    padding-top: calc(var(--safe-area-top) + 0.25rem);
+  }
+
+  .gt-safe-bottom {
+    padding-bottom: calc(var(--safe-area-bottom) + 0.5rem);
+  }
 }
