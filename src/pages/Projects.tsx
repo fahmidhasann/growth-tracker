@@ -24,6 +24,7 @@ const defaultForm = () => ({
 
 export function Projects() {
   const projects = useStore((s) => s.projects);
+  const mutating = useStore((s) => s.mutating);
   const addProject = useStore((s) => s.addProject);
   const updateProject = useStore((s) => s.updateProject);
   const updateProjectStatus = useStore((s) => s.updateProjectStatus);
@@ -88,11 +89,14 @@ export function Projects() {
   const ongoingCount = useMemo(() => projects.filter((p) => p.status === 'ongoing').length, [projects]);
   const completedCount = useMemo(() => projects.filter((p) => p.status === 'completed').length, [projects]);
 
-  const filterOptions: { label: string; value: StatusFilter; count: number }[] = [
-    { label: 'All', value: 'all', count: projects.length },
-    { label: 'Ongoing', value: 'ongoing', count: ongoingCount },
-    { label: 'Completed', value: 'completed', count: completedCount },
-  ];
+  const filterOptions = useMemo(
+    () => [
+      { label: 'All', value: 'all' as StatusFilter, count: projects.length },
+      { label: 'Ongoing', value: 'ongoing' as StatusFilter, count: ongoingCount },
+      { label: 'Completed', value: 'completed' as StatusFilter, count: completedCount },
+    ],
+    [projects.length, ongoingCount, completedCount]
+  );
 
   return (
     <motion.div
@@ -118,7 +122,7 @@ export function Projects() {
             <Button variant="ghost" type="button" onClick={closeModal}>
               Cancel
             </Button>
-            <Button variant="primary" type="submit" form="project-form">
+            <Button variant="primary" type="submit" form="project-form" loading={mutating}>
               {editingId ? 'Update Project' : 'Save Project'}
             </Button>
           </div>

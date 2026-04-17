@@ -21,6 +21,7 @@ const LEVEL_BAR_COLORS = [
 
 export function Skills() {
   const skills = useStore((s) => s.skills);
+  const mutating = useStore((s) => s.mutating);
   const addSkill = useStore((s) => s.addSkill);
   const updateSkillLevel = useStore((s) => s.updateSkillLevel);
   const updateSkillName = useStore((s) => s.updateSkillName);
@@ -88,7 +89,7 @@ export function Skills() {
             <Button variant="ghost" type="button" onClick={closeModal}>
               Cancel
             </Button>
-            <Button variant="primary" type="submit" form="skill-form">
+            <Button variant="primary" type="submit" form="skill-form" loading={mutating}>
               {editingId ? 'Update Skill' : 'Add Skill'}
             </Button>
           </div>

@@ -19,6 +19,7 @@ const defaultForm = () => ({
 
 export function Milestones() {
   const milestones = useStore((s) => s.milestones);
+  const mutating = useStore((s) => s.mutating);
   const addMilestone = useStore((s) => s.addMilestone);
   const updateMilestone = useStore((s) => s.updateMilestone);
   const deleteMilestone = useStore((s) => s.deleteMilestone);
@@ -97,7 +98,7 @@ export function Milestones() {
             <Button variant="ghost" type="button" onClick={closeModal}>
               Cancel
             </Button>
-            <Button variant="primary" type="submit" form="milestone-form">
+            <Button variant="primary" type="submit" form="milestone-form" loading={mutating}>
               {editingId ? 'Update Milestone' : 'Save Milestone'}
             </Button>
           </div>

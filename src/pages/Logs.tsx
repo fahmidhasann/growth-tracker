@@ -23,6 +23,7 @@ const defaultForm = () => ({
 
 export function Logs() {
   const logs = useStore((s) => s.logs);
+  const mutating = useStore((s) => s.mutating);
   const addLog = useStore((s) => s.addLog);
   const updateLog = useStore((s) => s.updateLog);
   const deleteLog = useStore((s) => s.deleteLog);
@@ -99,7 +100,7 @@ export function Logs() {
             <Button variant="ghost" type="button" onClick={closeModal}>
               Cancel
             </Button>
-            <Button variant="primary" type="submit" form="log-form">
+            <Button variant="primary" type="submit" form="log-form" loading={mutating}>
               {editingId ? 'Update Entry' : 'Save Entry'}
             </Button>
           </div>

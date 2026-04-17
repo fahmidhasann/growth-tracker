@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../lib/utils';
 import { motion } from 'motion/react';
+import { Loader2 } from 'lucide-react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -8,6 +9,7 @@ type ButtonSize = 'sm' | 'md' | 'lg';
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  loading?: boolean;
   children: ReactNode;
 }
 
@@ -31,25 +33,28 @@ const sizeStyles: Record<ButtonSize, string> = {
 export function Button({
   variant = 'primary',
   size = 'md',
+  loading = false,
   className,
   children,
   disabled,
   ...props
 }: ButtonProps) {
+  const isDisabled = disabled || loading;
   return (
     <motion.button
-      whileTap={{ scale: 0.98 }}
-      disabled={disabled}
+      whileTap={{ scale: isDisabled ? 1 : 0.98 }}
+      disabled={isDisabled}
       className={cn(
         'inline-flex items-center justify-center gap-2 font-medium transition-colors',
         'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring-focus)]',
         variantStyles[variant],
         sizeStyles[size],
-        disabled && 'cursor-not-allowed opacity-50 shadow-none',
+        isDisabled && 'cursor-not-allowed opacity-50 shadow-none',
         className
       )}
       {...(props as any)}
     >
+      {loading && <Loader2 className="w-4 h-4 animate-spin" />}
       {children}
     </motion.button>
   );

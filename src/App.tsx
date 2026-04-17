@@ -8,6 +8,7 @@ import { Layout } from './components/Layout';
 import { useStore } from './store/useStore';
 import { AuthScreen } from './components/AuthScreen';
 import { StatusBanner } from './components/StatusBanner';
+import { ToastContainer } from './components/Toast';
 
 export type Tab = 'dashboard' | 'logs' | 'skills' | 'projects' | 'milestones';
 export type Theme = 'dark' | 'light';
@@ -170,6 +171,7 @@ export default function App() {
           {activeTab === 'milestones' && <Milestones />}
         </Suspense>
       )}
+      <ToastContainer />
     </Layout>
   );
 }
